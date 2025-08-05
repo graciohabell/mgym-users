@@ -78,7 +78,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-md bg-white border border-red-100 rounded-2xl p-8 shadow-sm space-y-6">
 
         <h1 className="text-2xl text-center font-display italic font-extrabold text-red-600 tracking-wide"style={{ fontFamily: 'Tomorrow, sans-serif' }}>
-          /// DAFTAR AKSES MEMBER ROOM 
+        DAFTAR AKSES MEMBER REMINDER
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-black"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
@@ -142,7 +142,7 @@ export default function SignUpPage() {
           </button>
         </form>
       <p className="text-sm md:text-base text-neutral-700 max-w-md font-body mt-2 leading-relaxed"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-        Tetap ingat username dan password yang saat ini kamu daftarkan/sign-up untuk login/mengakses Member Room.
+        Tetap ingat username dan password yang saat ini kamu daftarkan/sign-up untuk login/mengakses Member Reminder.
       </p>
       </div>
     </main>

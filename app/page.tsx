@@ -39,14 +39,14 @@ export default function Home() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 z-50 w-full px-6 py-4 flex justify-between items-center bg-black/20 backdrop-blur-sm text-white">
         <h1 className="text-xl md:text-2xl font-display italic font-extrabold text-red-600 tracking-wide"style={{ fontFamily: 'Tomorrow, sans-serif' }}>
-          /// M.GYM
+          M.GYM
         </h1>
         <a
         href="/membership"
         className="text-sm px-3 py-1 rounded-md text-red-600 font-display italic font-extrabold hover:bg-white/30 active:shadow-inner transition duration-150 ease-in-out"
         style={{ fontFamily: 'Tomorrow, sans-serif' }}
       >
-        MEMBER ROOM
+        MEMBER SITE
       </a>
 
       </nav>

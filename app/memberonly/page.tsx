@@ -64,7 +64,7 @@ export default function MemberOnlyPage() {
     <main className="min-h-screen w-full bg-white flex items-center justify-center px-4 pt-28 font-body">
       <div className="w-full max-w-md bg-white border border-red-100 rounded-2xl p-8 shadow-sm text-center">
         <h1 className="text-2xl font-display italic font-extrabold text-red-600 tracking-wide mb-4"style={{ fontFamily: 'Tomorrow, sans-serif' }}>
-          ///
+          Hai,
         </h1>
 
         <div className="text-sm md:text-base text-neutral-700 max-w-md font-body mt-2 leading-relaxed"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>

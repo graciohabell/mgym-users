@@ -39,7 +39,7 @@ export default function LoginPage() {
     <main className="min-h-screen w-full bg-white flex items-center justify-center px-4 font-body">
       <div className="max-w-md w-full space-y-6 border border-red-100 rounded-2xl p-8 shadow-sm bg-white">
         <h1 className="text-2xl font-display italic font-extrabold text-red-600 tracking-wide text-center"style={{ fontFamily: 'Tomorrow, sans-serif' }}>
-          /// LOGIN M.GYM MEMBER ROOM
+          LOGIN M.GYM MEMBER REMINDER
         </h1>
 
         <form onSubmit={handleLogin} className="space-y-4 text-black"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>

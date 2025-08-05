@@ -47,7 +47,7 @@ export default function WaitingPage() {
       <div className="max-w-lg w-full text-center space-y-6 border border-red-100 bg-white rounded-2xl p-8 shadow-sm">
 
         <h1 className="text-2xl font-display italic font-extrabold text-red-600 tracking-wide">
-          /// MENUNGGU VERIFIKASI
+          MENUNGGU VERIFIKASI
         </h1>
 
         <p className="text-base text-neutral-700 font-medium">{message}</p>
