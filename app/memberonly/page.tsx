@@ -105,10 +105,6 @@ export default function MemberOnlyPage() {
           <p>
                 .
             </p>
-
-            <p>
-                "Tidak hanya sekedar latihan, Tetapi membangun kekeluargaan".
-            </p>
           
         </div>
         <div>
