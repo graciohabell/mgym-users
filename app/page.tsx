@@ -1,103 +1,130 @@
-import Image from "next/image";
+'use client'
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const sections = [
+    {
+      id: 1,
+      title: 'Membership Umum',
+      subtitle: '/// Paket 1 Bulan Rp120.000 & Paket 6 Bulan Rp660.000.',
+      image: '/images/mgymbg1.jpg',
+    },
+    {
+      id: 2,
+      title: 'Membership Khusus Pelajar',
+      subtitle: '/// Paket 1 Bulan Rp110.000.',
+      image: '/images/mgymbg2.jpg',
+    },
+    {
+      id: 3,
+      title: 'Kami Juga Tersedia Bagi Non Membership',
+      subtitle: '/// Umum Rp20.000 & Khusus Pelajar Rp15.000 per-hari.',
+      image: '/images/mgymbg3.jpg',
+    },
+    {
+      id: 4,
+      title: 'Ikuti Kami di Instagram, Tiktok dan WhatsApp',
+      subtitle: '/// +62 858 1480 0499 (Michael)',
+      image: '/images/mgymbg4.jpg',
+    },
+    {
+      id: 5,
+      title: 'Pendaftaran hanya on-site via Cash, QRIS, dsb.',
+      subtitle: '/// M.GYM tidak menerima pembayaran apapun via website, Hati-Hati penipuan !',
+      image: '/images/mgymbg5.jpg',
+    },
+  ]
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+  return (
+    <main className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth font-body">
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 z-50 w-full px-6 py-4 flex justify-between items-center bg-black/20 backdrop-blur-sm text-white">
+        <h1 className="text-xl md:text-2xl font-display italic font-extrabold text-red-600 tracking-wide"style={{ fontFamily: 'Tomorrow, sans-serif' }}>
+          /// M.GYM
+        </h1>
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        href="/membership"
+        className="text-sm px-3 py-1 rounded-md text-red-600 font-display italic font-extrabold hover:bg-white/30 active:shadow-inner transition duration-150 ease-in-out"
+        style={{ fontFamily: 'Tomorrow, sans-serif' }}
+      >
+        MEMBER ROOM
+      </a>
+
+      </nav>
+
+      {/* Hero Sections */}
+      {sections.map((sec) => (
+        <section
+          key={sec.id}
+          className="relative snap-start h-screen w-full bg-cover bg-center text-white flex flex-col justify-center items-start px-8 pt-24"
+          style={{ backgroundImage: `url('${sec.image}')` }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+          {/* Teks Judul & Subjudul */}
+          <div className="max-w-xl w-full space-y-4">
+            <h2 className="text-3xl md:text-4xl font-bold font-display drop-shadow-[0_0_2px_rgba(0,0,0,0.6)]"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+              {sec.title}
+            </h2>
+            <p className="text-lg md:text-xl text-white/90 font-body drop-shadow-[0_0_1px_rgba(0,0,0,0.5)]"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+              {sec.subtitle}
+            </p>
+          </div>
+
+          {/* IG + TikTok Embed (section 4) */}
+          {sec.id === 4 && (
+            <div className="mt-6 w-full max-w-xs sm:max-w-md flex flex-row gap-4 flex-wrap">
+              {/* Instagram */}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: `
+                  <iframe
+                    src="https://www.instagram.com/mgym_cilebut/embed"
+                    width="230"
+                    height="120"
+                    allowtransparency="true"
+                    frameborder="0"
+                    scrolling="no"
+                    allow="encrypted-media"
+                    class="rounded-xl border border-white"
+                  ></iframe>
+                `,
+                }}
+              />
+
+              {/* TikTok */}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: `
+                  <iframe
+                    src="https://www.tiktok.com/embed/@mgymowner"
+                    width="230"
+                    height="120"
+                    frameborder="0"
+                    allowfullscreen
+                    class="rounded-xl border border-white"
+                  ></iframe>
+                `,
+                }}
+              />
+            </div>
+          )}
+
+          {/* Maps Embed (section 5) */}
+          {sec.id === 5 && (
+            <div className="mt-6 w-full max-w-[700px]">
+              <div className="rounded-xl overflow-hidden border border-white w-full h-[260px] md:h-[300px]">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.911141169527!2d106.80018899999999!3d-6.532906099999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c34671e96f25%3A0x40242bbc8fe38a78!2sM%20GYM!5e0!3m2!1sid!2sid!4v1754301520797!5m2!1sid!2sid"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+            </div>
+          )}
+        </section>
+      ))}
+    </main>
+  )
 }
