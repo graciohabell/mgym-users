@@ -18,14 +18,14 @@ export default function Home() {
   const sections = [
     {
       id: 1,
-      title: 'Membership Umum',
-      subtitle: '/// Paket 1 Bulan Rp120.000 & Paket 6 Bulan Rp660.000.',
+      title: 'Cukup 3 Menit jalan kaki dari Stasiun Cilebut',
+      subtitle: '/// Gym kota Bogor dan sekitarnya dengan akses lokasi paling mudah.',
       image: '/images/mgymbg1.jpg',
     },
     {
       id: 2,
-      title: 'Membership Khusus Pelajar',
-      subtitle: '/// Paket 1 Bulan Rp110.000.',
+      title: 'Membership Umum & Khusus Pelajar',
+      subtitle: '/// Paket 1 Bulan Umum Rp120.000, Paket 6 Bulan Umum Rp660.000, dan Paket 1 Bulan Pelajar Rp110.000.',
       image: '/images/mgymbg2.jpg',
     },
     {
@@ -44,7 +44,7 @@ export default function Home() {
       id: 5,
       title: 'Pendaftaran hanya on-site via Cash, QRIS, dsb.',
       subtitle:
-        '/// M.GYM tidak menerima pembayaran apapun via website, Hati-Hati penipuan!',
+        '///Jl. Raya Cilebut, Cilebut Tim., Kec. Sukaraja, Kabupaten Bogor, Jawa Barat',
       image: '/images/mgymbg5.jpg',
     },
   ];
@@ -94,12 +94,21 @@ export default function Home() {
     <main className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth font-body">
       {/* Navbar */}
       <nav className="fixed top-0 left-0 z-50 w-full px-6 py-4 flex justify-between items-center bg-black/20 backdrop-blur-sm text-white">
-        <h1
-          className="text-xl md:text-2xl font-display italic font-extrabold text-red-600 tracking-wide"
-          style={{ fontFamily: 'Tomorrow, sans-serif' }}
-        >
-          M.GYM
-        </h1>
+        {/* Logo + Teks */}
+        <div className="flex items-center gap-2">
+          <img
+            src="images/logo-mgym.jpg"
+            alt="Logo M.GYM"
+            className="h-6 w-auto object-contain"
+          />
+          <h1
+            className="text-xl md:text-2xl font-display italic font-extrabold text-red-600 tracking-wide"
+            style={{ fontFamily: 'Tomorrow, sans-serif' }}
+          >
+            M.GYM
+          </h1>
+        </div>
+
         <a
           href="/membership"
           className="text-sm px-3 py-1 rounded-md text-red-600 font-display italic font-extrabold hover:bg-white/30 active:shadow-inner transition duration-150 ease-in-out"
@@ -181,7 +190,7 @@ export default function Home() {
 
         <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 px-2 w-full max-w-5xl">
           {testimonials.length === 0 ? (
-            <p className="text-gray-500 text-sm">Belum ada testimoni.</p>
+            <p className="text-gray-500 text-sm">Harap Tunggu...</p>
           ) : (
             testimonials.map((t, i) => (
               <motion.div
