@@ -77,7 +77,7 @@ export default function SignUpPage() {
     <main className="min-h-screen w-full bg-white flex items-center justify-center px-4 font-body">
       <div className="w-full max-w-md bg-white border border-red-100 rounded-2xl p-8 shadow-sm space-y-6">
 
-        <h1 className="text-2xl text-center font-display italic font-extrabold text-red-600 tracking-wide"style={{ fontFamily: 'Tomorrow, sans-serif' }}>
+        <h1 className="text-2xl text-center font-display italic font-extrabold text-red-600 tracking-wide"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
         DAFTAR AKSES MEMBER REMINDER
         </h1>
 

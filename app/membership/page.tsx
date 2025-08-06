@@ -6,7 +6,7 @@ export default function MembershipPage() {
   return (
     <main className="min-h-screen w-full bg-white flex items-center justify-center font-body px-4">
       <div className="w-full max-w-md bg-white rounded-2xl border border-red-100 shadow-sm p-8 flex flex-col items-center text-center gap-8">
-        <h1 className="text-2xl md:text-2xl font-display italic font-extrabold text-red-600 tracking-wide"style={{ fontFamily: 'Tomorrow, sans-serif' }}>
+        <h1 className="text-2xl md:text-2xl font-display italic font-extrabold text-red-600 tracking-wide"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
            M.GYM MEMBER REMINDER
         </h1>
 
