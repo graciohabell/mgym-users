@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 interface Testimoni {
   id: number;
@@ -35,7 +36,10 @@ export default function TestimoniPage() {
   return (
     <main className="min-h-screen bg-white px-6 pt-28 pb-20 font-body">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-display italic font-extrabold text-red-600 tracking-wide mb-10 text-center" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+        <h1
+          className="text-3xl md:text-4xl font-display italic font-extrabold text-red-600 tracking-wide mb-10 text-center"
+          style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
+        >
           Semua Testimoni Member M.GYM
         </h1>
 
@@ -54,27 +58,30 @@ export default function TestimoniPage() {
                 viewport={{ once: true }}
                 className="bg-red-50 border border-red-100 rounded-xl p-5 shadow-sm"
               >
-                <p className="text-sm italic text-gray-800 mb-3">"{item.testimoni}"</p>
+                <p className="text-sm italic text-gray-800 mb-3">
+                  &quot;{item.testimoni}&quot;
+                </p>
                 <p className="text-sm text-gray-600">— {item.nama}</p>
                 <p className="text-yellow-500 mt-1">
-                  {'⭐'.repeat(item.rating)}{item.rating < 5 ? '☆'.repeat(5 - item.rating) : ''}
+                  {'⭐'.repeat(item.rating)}
+                  {item.rating < 5 ? '☆'.repeat(5 - item.rating) : ''}
                 </p>
               </motion.div>
             ))}
           </div>
         )}
       </div>
-              {/* Link ke Beranda */}
-              <div className="mt-16 text-center">
-          <a
-            href="/"
-            className="inline-block bg-white text-red-600 border border-red-400 hover:bg-red-50 px-5 py-2 rounded-md text-sm font-bold font-display italic transition"
-            style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
-          >
-            Kembali ke Beranda
-          </a>
-        </div>
 
+      {/* Link ke Beranda */}
+      <div className="mt-16 text-center">
+        <Link
+          href="/"
+          className="inline-block bg-white text-red-600 border border-red-400 hover:bg-red-50 px-5 py-2 rounded-md text-sm font-bold font-display italic transition"
+          style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
+        >
+          Kembali ke Beranda
+        </Link>
+      </div>
     </main>
   );
 }
