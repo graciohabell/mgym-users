@@ -14,7 +14,22 @@ export default function AddMemberPage() {
 
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  function convertDMYtoYMD(dateStr: string) {
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+      const [d, m, y] = dateStr.split('/');
+      return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return dateStr;
+    }
+    return '';
+  }
+
+  function isValidISODate(dateStr: string) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,6 +40,15 @@ export default function AddMemberPage() {
     setLoading(true);
     setSuccessMsg('');
     setErrorMsg('');
+
+    const tglDaftarISO = convertDMYtoYMD(form.tgl_daftar);
+    const tglBerakhirISO = convertDMYtoYMD(form.tgl_berakhir);
+
+    if (!isValidISODate(tglDaftarISO) || !isValidISODate(tglBerakhirISO)) {
+      setErrorMsg('Tanggal harus dalam format YYYY-MM-DD atau DD/MM/YYYY yang valid.');
+      setLoading(false);
+      return;
+    }
 
     const { data: existing, error: existingError } = await supabase
       .from('members')
@@ -48,13 +72,13 @@ export default function AddMemberPage() {
         nama: form.nama,
         email: form.email,
         no_hp: form.no_hp,
-        tgl_daftar: form.tgl_daftar,
-        tgl_berakhir: form.tgl_berakhir,
+        tgl_daftar: tglDaftarISO,
+        tgl_berakhir: tglBerakhirISO,
       },
     ]);
 
     if (error) {
-      setErrorMsg('Gagal menambahkan member.');
+      setErrorMsg(`Gagal menambahkan member: ${error.message}`);
     } else {
       setSuccessMsg('Member berhasil ditambahkan!');
       setForm({
@@ -76,8 +100,7 @@ export default function AddMemberPage() {
       </h2>
 
       <div className="max-w-md mx-auto bg-black p-6 rounded-xl transition-colors shadow-lg">
-        <p className="text-white/50 text-center mb-6">
-        </p>
+        <p className="text-white/50 text-center mb-6"></p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {['nama', 'email', 'no_hp'].map((field) => (
