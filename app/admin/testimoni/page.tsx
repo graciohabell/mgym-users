@@ -112,7 +112,7 @@ export default function AdminTestimonialsPage() {
             >
               <div className="text-[11px] leading-tight">
                 <span className="font-semibold text-white">{t.nama}</span>
-                <p className="text-neutral-300 italic">"{t.testimoni}"</p>
+                <p className="text-neutral-300 italic">&quot;{t.testimoni}&quot;</p>
                 <span className="text-yellow-400 block">⭐ {t.rating}</span>
                 <span className="text-neutral-500 block text-[10px]">
                   {new Date(t.tanggal_input).toLocaleString('id-ID')}
