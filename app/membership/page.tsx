@@ -4,20 +4,20 @@ import Link from 'next/link'
 
 export default function MembershipPage() {
   return (
-    <main className="min-h-screen w-full bg-white flex items-center justify-center font-body px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-red-100 shadow-sm p-8 flex flex-col items-center text-center gap-8">
-        <h1 className="text-2xl md:text-2xl font-display italic font-extrabold text-red-600 tracking-wide"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+    <main className="min-h-screen w-full bg-black flex items-center justify-center font-body px-4">
+      <div className="w-full max-w-md bg-blac shadow-sm p-8 flex flex-col items-center text-center gap-8">
+        <h1 className="text-2xl md:text-2xl font-display italic font-extrabold text-white tracking-wide"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
            M.GYM MEMBER REMINDER
         </h1>
 
         <div className="flex flex-col gap-4 w-full">
           <Link href="/signup" className="w-full">
-            <button className="w-full px-6 py-3 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 font-semibold text-base md:text-lg transition font-body shadow-sm"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+            <button className="w-full px-5 py-1 rounded-lg  bg-red-600 hover:bg-white hover:text-red-600 text-white font-semibold text-base md:text-lg transition font-body shadow-sm"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
               Sign Up
             </button>
           </Link>
           <Link href="/login" className="w-full">
-            <button className="w-full px-6 py-3 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 font-semibold text-base md:text-lg transition font-body shadow-sm"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+            <button className="w-full px-5 py-1 rounded-lg bg-red-600 hover:bg-white hover:text-red-600 text-white font-semibold text-base md:text-lg transition font-body shadow-sm"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
               Login
             </button>
           </Link>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Tomorrow, Plus_Jakarta_Sans } from "next/font/google"
-import "./globals.css"
+import './globals.css'
 
 // FONT: Tomorrow untuk heading
 const tomorrow = Tomorrow({

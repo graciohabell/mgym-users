@@ -101,21 +101,21 @@ export default function MemberOnlyPage() {
         className="w-full max-w-md mx-auto bg-white/70 border border-red-100 rounded-2xl p-8 shadow-md text-center backdrop-blur-sm"
       >
         <h1 className="text-2xl font-display italic font-extrabold text-red-600 tracking-wide mb-4" style={{ fontFamily: 'Tomorrow, sans-serif' }}>
-          Hai,
+          
         </h1>
-        <div className="text-sm md:text-base text-neutral-700 mt-2 leading-relaxed font-body" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-          <p>Selamat Datang, {member?.nama}!</p>
+        <div className="text-sm font-semibold md:text-base text-neutral-700 mt-2 leading-relaxed font-body" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+          <p>Selamat Datang, {member?.nama} !</p>
           <p>Membership M.GYM kamu aktif dari {member?.tgl_daftar} sampai {member?.tgl_berakhir}.</p>
           <p>.</p>
           {!expired && daysLeft !== null && (
-            <p className={`font-display ${daysLeft <= 7 ? 'text-red-500' : 'text-green-500'}`}>
+            <p className={`font-display font-semibold ${daysLeft <= 7 ? 'text-red-700' : 'text-green-700'}`}>
               {daysLeft <= 7
                 ? `MEMBERSHIP AKAN BERAKHIR DALAM ${daysLeft} HARI LAGI`
                 : `MEMBERSHIP MASIH AKTIF`}
             </p>
           )}
           {expired && (
-            <p className="text-red-700 font-display">MEMBERSHIP SUDAH JATUH TEMPO</p>
+            <p className="text-red-700 font-semibold font-display">MEMBERSHIP SUDAH JATUH TEMPO</p>
           )}
           <p>.</p>
           <p className="text-sm mt-2"> Tidak hanya sekedar latihan, Tetapi membangun kekeluargaan.</p>
@@ -134,15 +134,15 @@ export default function MemberOnlyPage() {
         className="w-full max-w-md mx-auto mt-16"
       >
         <div className="border-t pt-8">
-          <h2 className="text-sm mb-4 text-black/70 text-center"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-            Testimoni
+          <h2 className="text-sm font-semibold mb-4 text-black/70 text-center"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+            TESTIMONI
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+          <form onSubmit={handleSubmit} className="text-sm space-y-4"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
             <textarea
               value={testimoni}
               onChange={(e) => setTestimoni(e.target.value)}
               placeholder="Tulis sudut pandang kamu terhadap M-Gym..."
-              className="text-sm w-full p-3 border border-gray-300 text-black rounded-md focus:outline-none focus:ring focus:border-red-300"
+              className="text-md w-full p-3 border border-gray-300 text-black rounded-md focus:outline-none focus:ring focus:border-red-300"
               rows={4}
             />
             <div>
@@ -161,9 +161,9 @@ export default function MemberOnlyPage() {
             </div>
             <button
               type="submit"
-              className="text-sm mt-2 w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition"
+              className="text-sm mt-2 w-full bg-red-600 text-white py-2 rounded-md hover:bg-white hover:text-red-600 transition"
             >
-              Kirim Testimoni
+              Kirim
             </button>
             {message && (
               <p className="text-sm text-center mt-2 text-red-600">{message}</p>

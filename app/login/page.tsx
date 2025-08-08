@@ -14,10 +14,19 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
 
-    // 🔍 Cek kecocokan username & password
+    if (!username.trim()) {
+      setError('Username wajib diisi.')
+      return
+    }
+    if (!password.trim()) {
+      setError('Password wajib diisi.')
+      return
+    }
+
+    // Cek kecocokan username & password
     const { data: member, error: loginError } = await supabase
       .from('members')
-      .select('id,nama', { head: false })
+      .select('id,nama')
       .eq('username', username)
       .eq('password', password)
       .single()
@@ -27,28 +36,34 @@ export default function LoginPage() {
       return
     }
 
-    // ✅ Simpan info member ke localStorage
+    // Simpan info member ke localStorage
     localStorage.setItem('member_id', member.id)
     localStorage.setItem('member_nama', member.nama)
 
-    // 🚀 Arahkan ke halaman khusus member
+    // Arahkan ke halaman khusus member
     router.push('/memberonly')
   }
 
   return (
-    <main className="min-h-screen w-full bg-white flex items-center justify-center px-4 font-body">
-      <div className="max-w-md w-full space-y-6 border border-red-100 rounded-2xl p-8 shadow-sm bg-white">
-        <h1 className="text-2xl font-display italic font-extrabold text-red-600 tracking-wide text-center"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-          LOGIN M.GYM MEMBER REMINDER
+    <main className="min-h-screen w-full bg-black flex items-center justify-center px-4 font-body relative">
+      <div className="max-w-md w-full space-y-6 bg-black/20">
+        <h1
+          className="text-2xl font-display italic font-extrabold text-white tracking-wide text-center"
+          style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
+        >
+          LOGIN M.GYM MEMBERSHIP
         </h1>
 
-        <form onSubmit={handleLogin} className="space-y-4 text-black"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+        <form
+          onSubmit={handleLogin}
+          className="space-y-4 text-white/80"
+          style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
+        >
           <input
             type="text"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            required
             className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
           />
           <input
@@ -56,23 +71,54 @@ export default function LoginPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
             className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
           />
 
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-
           <button
             type="submit"
-            className="w-full py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition"
+            className="w-full py-2 rounded-lg bg-red-600 hover:bg-white hover:text-red-600 text-white font-semibold transition"
           >
             Login
           </button>
         </form>
-        <p className="text-sm md:text-base text-neutral-700 max-w-md font-body mt-2 leading-relaxed">
-          <span className="text-red-600 italic font-semibold"style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}></span> Login dengan menggunakan username dan password yang telah kamu daftarkan pada saat proses sign/up.
-          <br /></p>
+
+        <p className="text-sm md:text-base text-neutral-500 max-w-md font-body mt-2 leading-relaxed">
+          Login dengan menggunakan username dan password yang telah kamu daftarkan pada saat proses sign-up.
+        </p>
       </div>
+
+      {/* Modal Error */}
+      {error && (
+        <div className="fixed inset-0 flex justify-center items-center z-50 pointer-events-none">
+          <div
+            className="bg-red-600 text-white rounded-2xl shadow-lg shadow-black/40 w-80 text-center p-6 pointer-events-auto scale-95 animate-[popIn_0.15s_ease-out_forwards]"
+            style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
+          >
+            <h3 className="text-lg font-semibold mb-2">Login Gagal</h3>
+            <p className="mb-4">{error}</p>
+            <div className="border-t border-red-500">
+              <button
+                onClick={() => setError('')}
+                className="w-full py-3 font-medium hover:rounded-lg hover:bg-red-700 transition-colors"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+          <style jsx>{`
+            @keyframes popIn {
+              from {
+                transform: scale(0.95);
+                opacity: 0;
+              }
+              to {
+                transform: scale(1);
+                opacity: 1;
+              }
+            }
+          `}</style>
+        </div>
+      )}
     </main>
   )
 }
