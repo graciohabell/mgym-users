@@ -27,27 +27,27 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ duration: 0.4 }}
-            className="fixed top-0 left-0 h-full w-48 bg-black shadow-xl z-50 border-r border-white/10 flex flex-col justify-between"
+            className="fixed top-0 left-0 h-full w-48 bg-black shadow-xl z-50 border-2 border-white/10 flex flex-col justify-between"
           >
             <div>
-              <div className="flex justify-between items-center p-4 border-b rounded-lg border-white/10">
+              <div className="flex justify-between items-center p-4 border-1 border-white/10">
                 <h2 className="text-red-600 font-[Plus Jakarta Sans]">.</h2>
               </div>
 
               <nav className="p-2 rounded-lg space-x-0">
-                <Link href="/admin/add-member" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                <Link href="/admin/add-member" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
                   ☰ Tambah
                 </Link>
-                <Link href="/admin/members" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                <Link href="/admin/members" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
                   ☰ Database
                 </Link>
-                <Link href="/admin/statistik" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                <Link href="/admin/statistik" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
                   ☰ Statistik
                 </Link>
-                <Link href="/admin/testimoni" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                <Link href="/admin/testimoni" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
                   ☰ Testimoni
                 </Link>
-                <Link href="/admin/notes" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                <Link href="/admin/notes" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
                   ☰ Catatan
                 </Link>
               </nav>
@@ -56,7 +56,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="p-2 border-t border-white/10">
               <button
                 onClick={() => setShowConfirm(true)}
-                className="block w-full text-center text-white/90 hover:bg-white/5 hover:text-white font-medium px-3 py-2 rounded-sm transition-colors font-[Plus Jakarta Sans]"
+                className="block w-full text-center text-white/40 hover:bg-white/10 hover:text-white font-medium px-3 py-2 rounded-sm transition-colors font-[Plus Jakarta Sans]"
               >
                 Logout
               </button>
@@ -76,7 +76,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             className="fixed inset-0 flex justify-center items-center z-[60] pointer-events-none"
           >
             <div className="bg-red-600 rounded-2xl shadow-lg shadow-black/30 w-80 text-center p-6 pointer-events-auto">
-              <h3 className="text-lg font-semibold text-white mb-2 font-[Plus Jakarta Sans]">
+              <h3 className="text-sm font-semibold text-white mb-2 font-[Plus Jakarta Sans]">
                 Logout?
               </h3>
               <p className="text-white/80 mb-4 font-[Plus Jakarta Sans]">

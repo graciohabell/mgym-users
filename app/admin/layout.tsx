@@ -25,11 +25,11 @@ export default function RootLayout({
 
           {/* Tombol pembuka sidebar, FIXED di kiri */}
           <button
-            className="fixed top-4 left-2 z-50 px-3 py-2 text-red-700"
+            className="fixed top-3 left-2 z-50 px-3 py-2 text-white/40"
             style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
-            <span className="text-lg font-bold">{sidebarOpen ? '||| ' : '☰ '}</span>
+            <span className="text-2xl font-extrabold">{sidebarOpen ? '||| ' : '☰ '}</span>
           </button>
 
           {/* Konten utama */}

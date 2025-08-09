@@ -55,7 +55,7 @@ export default function MembersList() {
       </h2>
 
       <h3 className="text-sm mb-8 font-[Plus Jakarta Sans] text-white/15 bg-clip-text">
-        Note : Rotasi layar kamu saat ini untuk pengalaman lebih baik.
+        Rotasi layar kamu saat ini untuk pengalaman lebih baik.
       </h3>
 
       <input
