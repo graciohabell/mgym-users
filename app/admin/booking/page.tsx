@@ -4,6 +4,17 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import '../../globals.css';
 
+interface BookingFromDB {
+  id: string;
+  member_id: string;
+  members: { nama: string }[]; 
+  trainer_list: { nama: string }[]; 
+  tanggal: string;
+  jam: string;
+  status: string;
+  created_at: string;
+}
+
 interface Booking {
   id: string;
   member_id: string;
@@ -43,11 +54,11 @@ export default function BookingList() {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      const mapped = data.map((b: any) => ({
+      const mapped = (data as BookingFromDB[]).map((b) => ({
         id: b.id,
         member_id: b.member_id,
-        member_nama: b.members?.nama || '-',
-        trainer_nama: b.trainer_list?.nama || '-',
+        member_nama: b.members?.[0]?.nama || '-',
+        trainer_nama: b.trainer_list?.[0]?.nama || '-',
         tanggal: b.tanggal,
         jam: b.jam,
         status: b.status,
@@ -200,50 +211,49 @@ export default function BookingList() {
         </div>
       )}
 
-{popup && (
-  <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-    <div
-      className="bg-red-600 text-white rounded-lg shadow-lg w-60 text-center p-4 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards]"
-      style={{ animationFillMode: 'forwards' }}
-    >
-      <h3 className="text-lg font-semibold text-white mb-2">
-        {popup.action === 'approve'
-          ? 'Setujui Booking Ini?'
-          : popup.action === 'reject'
-          ? 'Tolak Booking Ini?'
-          : 'Hapus Booking Ini?'}
-      </h3>
-      <p className="text-gray-300 mb-2">
-        {popup.action === 'delete'
-          ? 'Yakin menghapus booking ini?'
-          : 'Yakin mengubah status booking ini?'}
-      </p>
-      <div className="grid grid-cols-2 border-t rounded-2xl border-red-900/50">
-        <button
-          onClick={() => setPopup(null)}
-          className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={() => {
-            if (popup.action === 'approve') updateStatus(popup.id, 'approved');
-            if (popup.action === 'reject') updateStatus(popup.id, 'rejected');
-            if (popup.action === 'delete') deleteBooking(popup.id);
-          }}
-          className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors border-l border-red-900/50"
-        >
-          {popup.action === 'delete'
-            ? 'Delete'
-            : popup.action === 'approve'
-            ? 'Ya, Setujui'
-            : 'Ya, Tolak'}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+      {popup && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+          <div
+            className="bg-red-600 text-white rounded-lg shadow-lg w-60 text-center p-4 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards]"
+            style={{ animationFillMode: 'forwards' }}
+          >
+            <h3 className="text-lg font-semibold text-white mb-2">
+              {popup.action === 'approve'
+                ? 'Setujui Booking Ini?'
+                : popup.action === 'reject'
+                ? 'Tolak Booking Ini?'
+                : 'Hapus Booking Ini?'}
+            </h3>
+            <p className="text-gray-300 mb-2">
+              {popup.action === 'delete'
+                ? 'Yakin menghapus booking ini?'
+                : 'Yakin mengubah status booking ini?'}
+            </p>
+            <div className="grid grid-cols-2 border-t rounded-2xl border-red-900/50">
+              <button
+                onClick={() => setPopup(null)}
+                className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (popup.action === 'approve') updateStatus(popup.id, 'approved');
+                  if (popup.action === 'reject') updateStatus(popup.id, 'rejected');
+                  if (popup.action === 'delete') deleteBooking(popup.id);
+                }}
+                className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors border-l border-red-900/50"
+              >
+                {popup.action === 'delete'
+                  ? 'Delete'
+                  : popup.action === 'approve'
+                  ? 'Ya, Setujui'
+                  : 'Ya, Tolak'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
