@@ -12,6 +12,14 @@ interface MemberData {
   tgl_berakhir: string;
 }
 
+interface BookingFromDB {
+  id: string;
+  tanggal: string;
+  jam: string;
+  status: string;
+  trainer: { nama: string }[] | null;
+}
+
 interface Booking {
   id: string;
   tanggal: string;
@@ -35,18 +43,15 @@ export default function MemberOnlyPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [trainers, setTrainers] = useState<Trainer[]>([]);
 
-  
   const [tanggal, setTanggal] = useState('');
   const [jam, setJam] = useState('');
   const [trainerId, setTrainerId] = useState('');
   const [bookingMessage, setBookingMessage] = useState('');
 
- 
   const [testimoni, setTestimoni] = useState('');
   const [rating, setRating] = useState(5);
   const [message, setMessage] = useState('');
 
- 
   useEffect(() => {
     const fetchMemberData = async () => {
       const memberId = localStorage.getItem('member_id');
@@ -77,7 +82,6 @@ export default function MemberOnlyPage() {
     fetchMemberData();
   }, [router]);
 
-  
   const fetchBookings = async () => {
     const memberId = localStorage.getItem('member_id');
     if (!memberId) return;
@@ -95,18 +99,17 @@ export default function MemberOnlyPage() {
 
     if (!error && data) {
       setBookings(
-        data.map((b: any) => ({
+        data.map((b: BookingFromDB) => ({
           id: b.id,
           tanggal: b.tanggal,
           jam: b.jam,
           status: b.status,
-          trainer: { nama: b.trainer?.nama || '-' },
+          trainer: { nama: b.trainer && b.trainer.length > 0 ? b.trainer[0].nama : '-' },
         }))
       );
     }
   };
 
-  
   const fetchTrainers = async () => {
     const { data, error } = await supabase
       .from('trainer_list')
@@ -122,7 +125,6 @@ export default function MemberOnlyPage() {
     fetchTrainers();
   }, []);
 
-  
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tanggal || !jam || !trainerId || !member) {
@@ -151,7 +153,6 @@ export default function MemberOnlyPage() {
     }
   };
 
-  
   const handleSubmitTestimoni = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!testimoni || !rating || !member) {
@@ -187,9 +188,11 @@ export default function MemberOnlyPage() {
 
   return (
     <main className="min-h-screen w-full bg-white px-4 pt-28 font-semibold pb-20 text-black/70 font-body">
-      {/* Status Membership */}
       <motion.div className="w-full max-w-md mx-auto bg-white/70 border border-red-100 rounded-2xl p-8 shadow-md text-center backdrop-blur-sm">
-        <h1 className="text-2xl  font-display italic font-extrabold text-red-600 tracking-wide mb-4" style={{ fontFamily: 'Tomorrow, sans-serif', fontStyle: 'italic' }}>
+        <h1
+          className="text-2xl  font-display italic font-extrabold text-red-600 tracking-wide mb-4"
+          style={{ fontFamily: 'Tomorrow, sans-serif', fontStyle: 'italic' }}
+        >
           M.GYM
         </h1>
         <p>Selamat Datang, {member?.nama} !</p>
@@ -202,23 +205,16 @@ export default function MemberOnlyPage() {
               daysLeft <= 7 ? 'text-red-700' : 'text-green-700'
             }`}
           >
-            {daysLeft <= 7
-              ? `BERAKHIR DALAM ${daysLeft} HARI`
-              : 'MASIH AKTIF'}
+            {daysLeft <= 7 ? `BERAKHIR DALAM ${daysLeft} HARI` : 'MASIH AKTIF'}
           </p>
         )}
         {expired && (
-          <p className="text-red-700 font-semibold font-display">
-            SUDAH JATUH TEMPO
-          </p>
+          <p className="text-red-700 font-semibold font-display">SUDAH JATUH TEMPO</p>
         )}
       </motion.div>
 
-      {/* Booking Form */}
       <motion.div className="w-full max-w-md mx-auto mt-12 bg-white/70 border border-red-100 rounded-2xl p-6 shadow-md backdrop-blur-sm">
-        <h2 className="text-lg font-semibold mb-4 text-red-600">
-          Booking Sesi Personal Trainer
-        </h2>
+        <h2 className="text-lg font-semibold mb-4 text-red-600">Booking Sesi Personal Trainer</h2>
         <form onSubmit={handleBookingSubmit} className="space-y-4">
           <input
             type="date"
@@ -250,40 +246,42 @@ export default function MemberOnlyPage() {
           >
             Booking
           </button>
-          {bookingMessage && (
-            <p className="text-sm text-center text-red-600">{bookingMessage}</p>
-          )}
+          {bookingMessage && <p className="text-sm text-center text-red-600">{bookingMessage}</p>}
         </form>
       </motion.div>
 
-      {/* Booking List */}
       <motion.div className="w-full max-w-md mx-auto mt-8 bg-white/70 rounded-2xl p-6 shadow-md backdrop-blur-sm">
-        <h2 className="text-lg font-semibold mb-4 text-red-600">
-          Jadwal Booking
-        </h2>
+        <h2 className="text-lg font-semibold mb-4 text-red-600">Jadwal Booking</h2>
         {bookings.length === 0 ? (
           <p className="text-sm text-black/70">Belum ada booking.</p>
         ) : (
           <ul className="space-y-3">
             {bookings.map((b) => (
               <li key={b.id} className="p-3 bg-white text-black/70 text-sm shadow-sm">
-                <p><strong>Tanggal :</strong> {b.tanggal}</p>
-                <p><strong>Jam :</strong> {b.jam}</p>
-                <p><strong>Trainer :</strong> {b.trainer.nama}</p>
-                <p><strong>Status :</strong> {b.status}</p>
-                <p className="text-sm text-black/70">Hubungi admin jika jadwal belum di approved 1x24 jam !</p>
+                <p>
+                  <strong>Tanggal :</strong> {b.tanggal}
+                </p>
+                <p>
+                  <strong>Jam :</strong> {b.jam}
+                </p>
+                <p>
+                  <strong>Trainer :</strong> {b.trainer.nama}
+                </p>
+                <p>
+                  <strong>Status :</strong> {b.status}
+                </p>
+                <p className="text-sm text-black/70">
+                  Hubungi admin jika jadwal belum di approved 1x24 jam !
+                </p>
               </li>
             ))}
           </ul>
         )}
       </motion.div>
 
-      {/* Testimoni Form */}
       <motion.div className="w-full max-w-md mx-auto mt-12">
         <div className="border-t pt-8">
-          <h2 className="text-sm font-semibold mb-4 text-black/70 text-center">
-            TESTIMONI
-          </h2>
+          <h2 className="text-sm font-semibold mb-4 text-black/70 text-center">TESTIMONI</h2>
           <form onSubmit={handleSubmitTestimoni} className="text-sm space-y-4">
             <textarea
               value={testimoni}
@@ -312,9 +310,7 @@ export default function MemberOnlyPage() {
             >
               Kirim
             </button>
-            {message && (
-              <p className="text-sm text-center mt-2 text-red-600">{message}</p>
-            )}
+            {message && <p className="text-sm text-center mt-2 text-red-600">{message}</p>}
           </form>
         </div>
       </motion.div>
