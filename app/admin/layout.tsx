@@ -25,7 +25,7 @@ export default function RootLayout({
 
           {/* Tombol pembuka sidebar, FIXED di kiri */}
           <button
-            className="fixed top-4 left-4 z-50 px-3 py-2 bg-black/50 text-red-600 rounded shadow"
+            className="fixed top-4 left-2 z-50 px-3 py-2 text-red-700"
             style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >

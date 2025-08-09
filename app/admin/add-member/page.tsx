@@ -13,8 +13,9 @@ export default function AddMemberPage() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<'error' | 'confirm'>('confirm');
+  const [modalMessage, setModalMessage] = useState('');
 
   function convertDMYtoYMD(dateStr: string) {
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
@@ -35,20 +36,36 @@ export default function AddMemberPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleOpenModal = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setSuccessMsg('');
-    setErrorMsg('');
 
     const tglDaftarISO = convertDMYtoYMD(form.tgl_daftar);
     const tglBerakhirISO = convertDMYtoYMD(form.tgl_berakhir);
 
-    if (!isValidISODate(tglDaftarISO) || !isValidISODate(tglBerakhirISO)) {
-      setErrorMsg('Tanggal harus dalam format YYYY-MM-DD atau DD/MM/YYYY yang valid.');
-      setLoading(false);
+    if (!form.nama || !form.email || !form.no_hp || !form.tgl_daftar || !form.tgl_berakhir) {
+      setModalType('error');
+      setModalMessage('Semua field wajib diisi.');
+      setShowModal(true);
       return;
     }
+    if (!isValidISODate(tglDaftarISO) || !isValidISODate(tglBerakhirISO)) {
+      setModalType('error');
+      setModalMessage('Tanggal harus dalam format YYYY-MM-DD atau DD/MM/YYYY yang valid.');
+      setShowModal(true);
+      return;
+    }
+
+    setModalType('confirm');
+    setModalMessage('Yakin ingin menambahkan member ini?');
+    setShowModal(true);
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    setShowModal(false);
+
+    const tglDaftarISO = convertDMYtoYMD(form.tgl_daftar);
+    const tglBerakhirISO = convertDMYtoYMD(form.tgl_berakhir);
 
     const { data: existing, error: existingError } = await supabase
       .from('members')
@@ -56,31 +73,37 @@ export default function AddMemberPage() {
       .or(`email.eq.${form.email},no_hp.eq.${form.no_hp}`);
 
     if (existingError) {
-      setErrorMsg('Gagal mengecek data unik. Coba lagi.');
+      setModalType('error');
+      setModalMessage('Gagal mengecek data unik. Coba lagi.');
+      setShowModal(true);
       setLoading(false);
       return;
     }
 
     if (existing && existing.length > 0) {
-      setErrorMsg('Email atau No HP sudah terdaftar.');
+      setModalType('error');
+      setModalMessage('Email atau No HP sudah terdaftar.');
+      setShowModal(true);
       setLoading(false);
       return;
     }
 
-    const { error } = await supabase.from('members').insert([
-      {
-        nama: form.nama,
-        email: form.email,
-        no_hp: form.no_hp,
-        tgl_daftar: tglDaftarISO,
-        tgl_berakhir: tglBerakhirISO,
-      },
-    ]);
+    const { error } = await supabase.from('members').insert([{
+      nama: form.nama,
+      email: form.email,
+      no_hp: form.no_hp,
+      tgl_daftar: tglDaftarISO,
+      tgl_berakhir: tglBerakhirISO,
+    }]);
 
     if (error) {
-      setErrorMsg(`Gagal menambahkan member: ${error.message}`);
+      setModalType('error');
+      setModalMessage(`Gagal menambahkan member: ${error.message}`);
+      setShowModal(true);
     } else {
-      setSuccessMsg('Member berhasil ditambahkan!');
+      setModalType('error');
+      setModalMessage('Member berhasil ditambahkan!');
+      setShowModal(true);
       setForm({
         nama: '',
         email: '',
@@ -95,14 +118,12 @@ export default function AddMemberPage() {
 
   return (
     <div className="min-h-screen bg-black p-6 font-jakarta">
-      <h2 className="text-2xl md:text-3xl font-style italic font-semibold text-red-700 mb-6 tracking-tight text-center">
+      <h2 className="text-2xl md:text-3xl italic font-semibold text-red-700 mb-6 tracking-tight text-center">
         FORM MEMBERSHIP
       </h2>
 
-      <div className="max-w-md mx-auto bg-black p-6 rounded-xl transition-colors shadow-lg">
-        <p className="text-white/50 text-center mb-6"></p>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="max-w-md mx-auto bg-black p-6 rounded-xl shadow-lg">
+        <form onSubmit={handleOpenModal} className="space-y-5">
           {['nama', 'email', 'no_hp'].map((field) => (
             <div key={field}>
               <label className="block text-sm font-medium text-red-300 capitalize mb-1">
@@ -113,8 +134,7 @@ export default function AddMemberPage() {
                 name={field}
                 value={form[field as keyof typeof form]}
                 onChange={handleChange}
-                required
-                className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-gray-200 focus:ring-2  focus:border-transparent transition-all hover:border-red-600/40"
+                className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-gray-200 focus:ring-2 focus:border-transparent transition-all hover:border-red-600/40"
               />
             </div>
           ))}
@@ -129,8 +149,7 @@ export default function AddMemberPage() {
                 name="tgl_daftar"
                 value={form.tgl_daftar}
                 onChange={handleChange}
-                required
-                className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white/10 focus:ring-2 focus:border-transparent transition-all hover:border-red-600/40"
+                className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-gray-200 focus:ring-2 focus:border-transparent transition-all hover:border-red-600/40"
               />
             </div>
             <div>
@@ -142,8 +161,7 @@ export default function AddMemberPage() {
                 name="tgl_berakhir"
                 value={form.tgl_berakhir}
                 onChange={handleChange}
-                required
-                className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-white/10 focus:ring-2 focus:border-transparent transition-all hover:border-red-600/40"
+                className="w-full px-4 py-3 rounded-lg bg-black border border-white/10 text-gray-200 focus:ring-2 focus:border-transparent transition-all hover:border-red-600/40"
               />
             </div>
           </div>
@@ -151,23 +169,43 @@ export default function AddMemberPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#fb0000] to-[#b30000] hover:from-red-700 hover:to-red-800 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+            className="w-full bg-gradient-to-r from-[#fb0000] to-[#b30000] hover:from-red-700 hover:to-red-800 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
           >
             {loading ? 'Memproses...' : 'Tambahkan'}
           </button>
         </form>
-
-        {successMsg && (
-          <div className="mt-6 p-4 bg-green-900/20 text-green-400 rounded-lg border border-green-400/30 transition-all">
-            {successMsg}
-          </div>
-        )}
-        {errorMsg && (
-          <div className="mt-6 p-4 bg-red-900/20 text-red-400 rounded-lg border border-red-400/30 transition-all">
-            {errorMsg}
-          </div>
-        )}
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-red-600 border border-red-700 rounded-xl p-6 max-w-sm w-full text-center">
+            <p className="text-white text-lg mb-6">{modalMessage}</p>
+            {modalType === 'error' ? (
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 rounded-lg bg-red-700 text-white hover:bg-red-800"
+              >
+                OK
+              </button>
+            ) : (
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 rounded-lg border border-white/10 text-white hover:bg-red-800"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="px-4 py-2 rounded-lg border border-white/10 text-white hover:bg-red-800"
+                >
+                  Yakin
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');

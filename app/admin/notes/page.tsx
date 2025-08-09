@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Note {
   id: string;
@@ -17,6 +18,8 @@ export default function AdminNotes() {
   const [isiBaru, setIsiBaru] = useState('');
   const [pakaiDeadline, setPakaiDeadline] = useState(false);
   const [deadlineBaru, setDeadlineBaru] = useState('');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState<{ id: string; judul: string } | null>(null);
 
   useEffect(() => {
     fetchNotes();
@@ -51,20 +54,21 @@ export default function AdminNotes() {
     }
   };
 
-  const hapusNote = async (id: string, judul: string) => {
-    if (confirm(`Hapus catatan "${judul}"?`)) {
-      const { error } = await supabase.from('admin_notes').delete().eq('id', id);
-      if (!error) {
-        fetchNotes();
-      } else {
-        alert('Gagal hapus catatan.');
-      }
+  const hapusNote = async () => {
+    if (!noteToDelete) return;
+    const { error } = await supabase.from('admin_notes').delete().eq('id', noteToDelete.id);
+    if (!error) {
+      fetchNotes();
+    } else {
+      alert('Gagal hapus catatan.');
     }
+    setShowConfirm(false);
+    setNoteToDelete(null);
   };
 
   return (
     <div className="min-h-screen p-6 bg-black font-jakarta">
-      <h1 className="text-2xl md:text-3xl font-style italic font-semibold text-red-700 mb-6 tracking-tight">
+      <h1 className="text-2xl md:text-3xl italic font-semibold text-red-700 mb-6 tracking-tight">
         DASHBOARD NOTES
       </h1>
 
@@ -118,7 +122,10 @@ export default function AdminNotes() {
           >
             {/* Tombol hapus */}
             <button
-              onClick={() => hapusNote(note.id, note.judul)}
+              onClick={() => {
+                setNoteToDelete({ id: note.id, judul: note.judul });
+                setShowConfirm(true);
+              }}
               className="absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold text-lg leading-none"
               aria-label={`Hapus catatan ${note.judul}`}
               type="button"
@@ -127,7 +134,7 @@ export default function AdminNotes() {
             </button>
 
             <div>
-              <h3 className="font-semibold text-[#ff4d4d] text-base mb-1">{note.judul}</h3>
+              <h3 className="font-semibold text-white text-base mb-1">{note.judul}</h3>
               <p className="text-xs leading-snug whitespace-pre-line">{note.isi}</p>
             </div>
             {note.with_deadline && (
@@ -137,8 +144,46 @@ export default function AdminNotes() {
             )}
           </div>
         ))}
-
       </div>
+
+      {/* Pop Up Konfirmasi Hapus */}
+      <AnimatePresence>
+        {showConfirm && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 flex justify-center items-center z-[60] pointer-events-none"
+          >
+            <div className="bg-red-600 rounded-2xl shadow-lg shadow-black/30 w-80 text-center p-6 pointer-events-auto">
+              <h3 className="text-lg font-semibold text-white mb-2 font-[Plus Jakarta Sans]">
+                Hapus Catatan?
+              </h3>
+              <p className="text-white/80 mb-4 font-[Plus Jakarta Sans]">
+                Yakin mau hapus catatan "{noteToDelete?.judul}"?
+              </p>
+              <div className="grid grid-cols-2 border-t border-red-400/50">
+                <button
+                  onClick={() => {
+                    setShowConfirm(false);
+                    setNoteToDelete(null);
+                  }}
+                  className="py-3 text-white font-medium hover:bg-red-500/50 transition-colors font-[Plus Jakarta Sans]"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={hapusNote}
+                  className="py-3 text-white font-medium hover:bg-red-700 transition-colors border-l border-red-400/50 font-[Plus Jakarta Sans]"
+                >
+                  Yakin
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');

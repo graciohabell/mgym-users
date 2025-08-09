@@ -54,12 +54,16 @@ export default function MembersList() {
         TABEL DAFTAR MEMBERSHIP
       </h2>
 
+      <h3 className="text-sm mb-8 font-[Plus Jakarta Sans] text-white/15 bg-clip-text">
+        Note : Rotasi layar kamu saat ini untuk pengalaman lebih baik.
+      </h3>
+
       <input
         type="text"
         placeholder="Cari nama..."
         value={searchKeyword}
         onChange={(e) => setSearchKeyword(e.target.value)}
-        className="mb-6 px-4 py-2 rounded-md border border-white/10 text-white/50 w-full max-w-sm placeholder:text-white/10"
+        className="mb-3 px-2 py-1 rounded-md border border-white/10 text-white/50 w-full max-w-sm placeholder:text-white/10"
         style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
       />
 

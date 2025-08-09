@@ -65,83 +65,84 @@ export default function AdminTestimonialsPage() {
 
   return (
     <main
-      className="min-h-screen bg-black text-white p-4 font-sans"
+      className="min-h-screen bg-black text-white p-6 font-sans"
       style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
     >
-      <h1 className="text-3xl font-semibold italic mb-3 text-red-700">
+      <h1 className="text-3xl font-semibold italic mb-6 text-red-700">
         DATABASE TESTIMONI
       </h1>
 
-      {/* Filter Rating */}
-      <div className="flex gap-1 mb-4 flex-wrap">
+      {/* Filter Rating Bar */}
+      <div className="bg-neutral-900 rounded-xl overflow-hidden w-full max-w-3xl mx-auto flex divide-x divide-neutral-800 shadow-md mb-8">
         <button
           onClick={() => setFilterRating(null)}
-          className={`px-2 py-1 rounded text-xs font-medium transition ${
+          className={`flex-1 py-2 text-sm font-medium transition-all ${
             filterRating === null
-              ? 'bg-red-800 text-white'
-              : 'bg-neutral-800 hover:bg-neutral-700'
+              ? 'bg-red-700 text-white'
+              : 'hover:bg-neutral-800 text-gray-300'
           }`}
         >
-          Semua
+          All
         </button>
         {[1, 2, 3, 4, 5].map((r) => (
           <button
             key={r}
             onClick={() => setFilterRating(r)}
-            className={`px-2 py-1 rounded text-xs font-medium transition ${
+            className={`flex-1 py-2 text-sm font-medium transition-all ${
               filterRating === r
-                ? 'bg-red-800 text-white'
-                : 'bg-neutral-800 hover:bg-neutral-700'
+                ? 'bg-red-700 text-white'
+                : 'hover:bg-neutral-800 text-gray-300'
             }`}
           >
-            ⭐{r}
+            ⭐ {r}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <p className="text-neutral-400 text-xs">Memuat data...</p>
+        <p className="text-neutral-400 text-sm text-center">Memuat data...</p>
       ) : testimonials.length === 0 ? (
-        <p className="text-neutral-500 text-xs">Belum ada testimoni.</p>
+        <p className="text-neutral-500 text-sm text-center">Belum ada testimoni.</p>
       ) : (
-        <div className="space-y-1">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((t) => (
             <div
               key={t.id}
-              className="bg-neutral-900 rounded p-2  border-neutral-800 flex justify-between items-start"
+              className="bg-neutral-900 rounded-lg p-3 border border-neutral-800 shadow hover:shadow-lg transition-all duration-200 relative text-sm"
             >
-              <div className="text-[11px] leading-tight">
-                <span className="font-semibold text-white">{t.nama}</span>
-                <p className="text-neutral-300 italic">&quot;{t.testimoni}&quot;</p>
-                <span className="text-yellow-400 block">⭐ {t.rating}</span>
-                <span className="text-neutral-500 block text-[10px]">
-                  {new Date(t.tanggal_input).toLocaleString('id-ID')}
-                </span>
-              </div>
               <button
                 onClick={() => setConfirmDeleteId(t.id)}
-                className="text-red-500 px-2 py-1 hover:text-red-600 rounded text-[10px] transition"
+                className="absolute top-2 right-2 text-red-500 hover:text-red-600 transition text-xs"
               >
                 ✕
               </button>
+              <div className="mb-1">
+                <span className="block font-semibold">{t.nama}</span>
+                <span className="text-yellow-400 text-xs">⭐ {t.rating}</span>
+              </div>
+              <p className="text-neutral-300 italic mb-2">
+                “{t.testimoni}”
+              </p>
+              <span className="text-neutral-500 text-[10px]">
+                {new Date(t.tanggal_input).toLocaleString('id-ID')}
+              </span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Modal Notifikasi */}
       {modalMsg && (
-        <div className="fixed inset-0 flex justify-center items-center z-50 pointer-events-none">
+        <div className="fixed inset-0 flex justify-center items-center z-50">
           <div
             className={`${
               modalType === 'error' ? 'bg-red-600' : 'bg-green-600'
-            } text-white rounded-lg shadow-lg w-60 text-center p-4 pointer-events-auto scale-95 animate-[popIn_0.15s_ease-out_forwards]`}
+            } text-white rounded-lg shadow-lg w-60 text-center p-4`}
           >
             <h3 className="text-sm font-semibold mb-1">
               {modalType === 'error' ? 'Peringatan' : 'Berhasil'}
             </h3>
             <p className="mb-2 text-xs">{modalMsg}</p>
-            <div className="border-t border-white/20">
+            <div className="border-t border-white/20 mt-2">
               <button
                 onClick={() => setModalMsg('')}
                 className="w-full py-1.5 text-xs font-medium hover:bg-black/20 transition-colors rounded"
@@ -150,54 +151,29 @@ export default function AdminTestimonialsPage() {
               </button>
             </div>
           </div>
-          <style jsx>{`
-            @keyframes popIn {
-              from {
-                transform: scale(0.95);
-                opacity: 0;
-              }
-              to {
-                transform: scale(1);
-                opacity: 1;
-              }
-            }
-          `}</style>
         </div>
       )}
 
-      {/* Modal Konfirmasi Hapus */}
       {confirmDeleteId && (
         <div className="fixed inset-0 flex justify-center items-center z-50">
-          <div className="bg-red-600 text-white rounded-lg shadow-lg w-60 text-center p-4 scale-95 animate-[popIn_0.15s_ease-out_forwards]">
+          <div className="bg-red-600 text-white rounded-lg shadow-lg w-60 text-center p-4">
             <h3 className="text-sm font-semibold mb-1">Konfirmasi Hapus</h3>
             <p className="mb-2 text-xs">Yakin mau hapus testimoni ini?</p>
             <div className="flex border-t border-white/20">
               <button
                 onClick={() => setConfirmDeleteId(null)}
-                className="flex-1 py-1.5 text-xs font-medium hover:bg-black/20 transition-colors rounded-bl-lg"
+                className="flex-1 py-1.5 text-xs font-medium hover:bg-black/20 transition-colors"
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 py-1.5 text-xs font-medium hover:bg-black/20 transition-colors rounded-br-lg"
+                className="flex-1 py-1.5 text-xs font-medium hover:bg-black/20 transition-colors"
               >
                 Ya
               </button>
             </div>
           </div>
-          <style jsx>{`
-            @keyframes popIn {
-              from {
-                transform: scale(0.95);
-                opacity: 0;
-              }
-              to {
-                transform: scale(1);
-                opacity: 1;
-              }
-            }
-          `}</style>
         </div>
       )}
     </main>

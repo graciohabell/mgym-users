@@ -34,13 +34,13 @@ export default function TestimoniPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-white px-6 pt-28 pb-20 font-body">
+    <main className="min-h-screen bg-black px-6 pt-28 pb-20 font-body">
       <div className="max-w-5xl mx-auto">
         <h1
-          className="text-3xl md:text-4xl font-display italic font-extrabold text-red-600 tracking-wide mb-10 text-center"
+          className="text-3xl md:text-4xl font-display italic font-extrabold text-white tracking-wide mb-10 text-center"
           style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
         >
-          Semua Testimoni Member M.GYM
+          Ini Kata Para Membership Tentang Kami
         </h1>
 
         {loading ? (
@@ -56,12 +56,12 @@ export default function TestimoniPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-red-50 border border-red-100 rounded-xl p-5 shadow-sm"
+                className="bg-white/20 rounded-xl p-5 shadow-sm"
               >
-                <p className="text-sm italic text-gray-800 mb-3">
+                <p className="text-sm italic text-white mb-3">
                   &quot;{item.testimoni}&quot;
                 </p>
-                <p className="text-sm text-gray-600">— {item.nama}</p>
+                <p className="text-sm text-white/50">— {item.nama}</p>
                 <p className="text-yellow-500 mt-1">
                   {'⭐'.repeat(item.rating)}
                   {item.rating < 5 ? '☆'.repeat(5 - item.rating) : ''}

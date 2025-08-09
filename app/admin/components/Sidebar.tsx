@@ -1,8 +1,9 @@
 'use client';
 
-import { FiMenu } from 'react-icons/fi';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -10,69 +11,95 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    router.push('/');
+  };
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.aside
-          initial={{ x: '-100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '-100%' }}
-          transition={{ duration: 0.3 }}
-          className="fixed top-0 left-0 h-full w-48 bg-black shadow-xl z-50 border-r border-white/10 flex flex-col justify-between"
-        >
-          <div>
-            <div className="flex justify-between items-center p-6 border-b rounded-lg border-white/10">
-              <h2 className=" text-red-600 font-[Plus Jakarta Sans]">
-               .
-              </h2>
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.aside
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.4 }}
+            className="fixed top-0 left-0 h-full w-48 bg-black shadow-xl z-50 border-r border-white/10 flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex justify-between items-center p-4 border-b rounded-lg border-white/10">
+                <h2 className="text-red-600 font-[Plus Jakarta Sans]">.</h2>
+              </div>
+
+              <nav className="p-2 rounded-lg space-x-0">
+                <Link href="/admin/add-member" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                  ☰ Tambah
+                </Link>
+                <Link href="/admin/members" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                  ☰ Database
+                </Link>
+                <Link href="/admin/statistik" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                  ☰ Statistik
+                </Link>
+                <Link href="/admin/testimoni" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                  ☰ Testimoni
+                </Link>
+                <Link href="/admin/notes" className="block px-4 py-2 rounded-sm text-white/90 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                  ☰ Catatan
+                </Link>
+              </nav>
             </div>
 
-            <nav className="p-4 rounded-lg space-y-2">
-              <Link 
-                href="/admin/add-member" 
-                className="block px-4 py-3 rounded-sm text-red-600 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]"
+            <div className="p-2 border-t border-white/10">
+              <button
+                onClick={() => setShowConfirm(true)}
+                className="block w-full text-center text-white/90 hover:bg-white/5 hover:text-white font-medium px-3 py-2 rounded-sm transition-colors font-[Plus Jakarta Sans]"
               >
-                ☰ Tambah
-              </Link>
-              <Link 
-                href="/admin/members" 
-                className="block px-4 py-3 rounded-sm text-red-600 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]"
-              >
-                ☰ Database
-              </Link>
-              <Link 
-                href="/admin/statistik" 
-                className="block px-4 py-3 rounded-sm text-red-600 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]"
-              >
-                ☰ Statistik
-              </Link>
-              <Link 
-                href="/admin/testimoni" 
-                className="block px-4 py-3 rounded-sm text-red-600 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]"
-              >
-                ☰ Testimoni
-              </Link>
-              <Link 
-                href="/admin/notes" 
-                className="block px-4 py-3 rounded-sm text-red-600 hover:bg-white/5 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]"
-              >
-                ☰ Catatan
-              </Link>
-            </nav>
-          </div>
+                Logout
+              </button>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
-          
-          <div className="p-4 border-t border-white/10">
-  <Link
-    href="/membership"
-    className="block w-full text-center text-red-600 hover:bg-white/5 hover:text-white font-medium px-4 py-3 rounded-sm transition-colors font-[Plus Jakarta Sans]"
-   
-  >
-    Logout
-  </Link>
-</div>
-        </motion.aside>
-      )}
-    </AnimatePresence>
+      {/* Pop Up Logout */}
+      <AnimatePresence>
+        {showConfirm && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 flex justify-center items-center z-[60] pointer-events-none"
+          >
+            <div className="bg-red-600 rounded-2xl shadow-lg shadow-black/30 w-80 text-center p-6 pointer-events-auto">
+              <h3 className="text-lg font-semibold text-white mb-2 font-[Plus Jakarta Sans]">
+                Logout?
+              </h3>
+              <p className="text-white/80 mb-4 font-[Plus Jakarta Sans]">
+                Yakin mau keluar dari dashboard?
+              </p>
+              <div className="grid grid-cols-2 border-t border-red-400/50">
+                <button
+                  onClick={() => setShowConfirm(false)}
+                  className="py-3 text-white font-medium hover:bg-red-500/50 transition-colors font-[Plus Jakarta Sans]"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="py-3 text-white font-medium hover:bg-red-700 transition-colors border-l border-red-400/50 font-[Plus Jakarta Sans]"
+                >
+                  Yakin
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

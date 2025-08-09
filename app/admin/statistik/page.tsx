@@ -34,7 +34,7 @@ export default function AnalyticsPage() {
     expSoon: 0,
     testimoniBulanIni: 0,
     pertumbuhanBulanan: [] as number[],
-    ratingCounts: [0, 0, 0, 0, 0], // index 0 = bintang 1
+    ratingCounts: [0, 0, 0, 0, 0],
   });
 
   const bulanLabels = Array.from({ length: 12 }, (_, i) =>
@@ -49,8 +49,8 @@ export default function AnalyticsPage() {
       const sevenDaysLater = today.add(7, 'day').toISOString();
 
       const { data: allMembers } = await supabase.from('members').select('*');
-      const aktif = (allMembers ?? []).filter(
-        (m) => m.tgl_berakhir && dayjs(m.tgl_berakhir).isAfter(today)
+      const aktif = (allMembers ?? []).filter((m) =>
+        m.tgl_berakhir ? dayjs(m.tgl_berakhir).isAfter(today) : false
       ).length;
       const nonAktif = (allMembers?.length ?? 0) - aktif;
       const expSoon = (allMembers ?? []).filter(
@@ -66,10 +66,10 @@ export default function AnalyticsPage() {
         .gte('tanggal_input', startOfMonth)
         .lte('tanggal_input', endOfMonth);
 
-      // Ambil jumlah masing-masing rating
       const { data: allTestimonials } = await supabase
         .from('testimonials')
         .select('rating');
+
       const ratingCounts = [0, 0, 0, 0, 0];
       (allTestimonials ?? []).forEach((t) => {
         if (t.rating >= 1 && t.rating <= 5) {
@@ -128,13 +128,7 @@ export default function AnalyticsPage() {
     datasets: [
       {
         data: stats.ratingCounts,
-        backgroundColor: [
-          '#ff0000', 
-          '#ff4000', 
-          '#ff6600', 
-          '#ff9900', 
-          '#ffd500', 
-        ],
+        backgroundColor: ['#ff0000', '#ff4000', '#ff6600', '#ff9900', '#ffd500'],
         borderWidth: 0,
       },
     ],
@@ -146,89 +140,18 @@ export default function AnalyticsPage() {
         DASHBOARD STATISTIK M.GYM
       </h1>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatBox label="Total Data Member Aktif" value={stats.aktif} />
         <StatBox label="Total Data Member Non-Aktif" value={stats.nonAktif} />
-        <StatBox label="Total Data Akan Non-Aktif dalam 7 Hari" value={stats.expSoon} />
+        <StatBox
+          label="Total Data Akan Non-Aktif dalam 7 Hari"
+          value={stats.expSoon}
+        />
         <StatBox label="Total Testimoni" value={stats.testimoniBulanIni} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-6">
         <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-          <h2 className="text-sm italic font-semibold text-red-700 mb-2">
-            Persentase Seluruh Status Member Dalam Database
-          </h2>
-          <div className="h-64">
-            <Pie
-              data={memberComparisonData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    position: 'right',
-                    labels: {
-                      color: '#f3f4f6',
-                      font: { family: "'Plus Jakarta Sans', sans-serif" },
-                    },
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        const label = context.label || '';
-                        const value = Number(context.raw) || 0;
-                        const percentage = totalMembers
-                          ? Math.round((value / totalMembers) * 100)
-                          : 0;
-                        return `${label}: ${value} (${percentage}%)`;
-                      },
-                    },
-                  },
-                  datalabels: { display: false },
-                },
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-          <h2 className="text-sm italic font-semibold text-red-700 mb-2">
-            Persentase Seluruh Rating Testimoni Dalam Databse
-          </h2>
-          <div className="h-64">
-            <Pie
-              data={ratingChartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    position: 'right',
-                    labels: {
-                      color: '#f3f4f6',
-                      font: { family: "'Plus Jakarta Sans', sans-serif" },
-                    },
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        const label = context.label || '';
-                        const value = Number(context.raw) || 0;
-                        const percentage = totalTestimoni
-                          ? Math.round((value / totalTestimoni) * 100)
-                          : 0;
-                        return `${label}: ${value} (${percentage}%)`;
-                      },
-                    },
-                  },
-                  datalabels: { display: false },
-                },
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors lg:col-span-2">
           <h2 className="text-md font-semibold italic text-red-700 mb-3">
             Pertumbuhan Member
           </h2>
@@ -241,7 +164,7 @@ export default function AnalyticsPage() {
                     label: 'Member Baru',
                     data: stats.pertumbuhanBulanan,
                     borderColor: '#dc2626',
-                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                    backgroundColor: 'rgba(220, 38, 38, 0.08)',
                     borderWidth: 2,
                     pointBackgroundColor: '#dc2626',
                     pointBorderColor: '#fff',
@@ -280,6 +203,82 @@ export default function AnalyticsPage() {
                 },
               }}
             />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
+            <h2 className="text-sm italic font-semibold text-red-700 mb-2">
+              Persentase Seluruh Status Member Dalam Database
+            </h2>
+            <div className="h-48">
+              <Pie
+                data={memberComparisonData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: 'right',
+                      labels: {
+                        color: '#f3f4f6',
+                        font: { family: "'Plus Jakarta Sans', sans-serif" },
+                      },
+                    },
+                    tooltip: {
+                      callbacks: {
+                        label: function (context) {
+                          const label = context.label || '';
+                          const value = Number(context.raw) || 0;
+                          const percentage = totalMembers
+                            ? Math.round((value / totalMembers) * 100)
+                            : 0;
+                          return `${label}: ${value} (${percentage}%)`;
+                        },
+                      },
+                    },
+                    datalabels: { display: false },
+                  },
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
+            <h2 className="text-sm italic font-semibold text-red-700 mb-2">
+              Persentase Seluruh Rating Testimoni Dalam Database
+            </h2>
+            <div className="h-48">
+              <Pie
+                data={ratingChartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: 'right',
+                      labels: {
+                        color: '#f3f4f6',
+                        font: { family: "'Plus Jakarta Sans', sans-serif" },
+                      },
+                    },
+                    tooltip: {
+                      callbacks: {
+                        label: function (context) {
+                          const label = context.label || '';
+                          const value = Number(context.raw) || 0;
+                          const percentage = totalTestimoni
+                            ? Math.round((value / totalTestimoni) * 100)
+                            : 0;
+                          return `${label}: ${value} (${percentage}%)`;
+                        },
+                      },
+                    },
+                    datalabels: { display: false },
+                  },
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
