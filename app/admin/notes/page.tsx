@@ -161,7 +161,7 @@ export default function AdminNotes() {
                 Hapus Catatan?
               </h3>
               <p className="text-white/80 mb-4 font-[Plus Jakarta Sans]">
-                Yakin mau hapus catatan "{noteToDelete?.judul}"?
+                Yakin mau hapus catatan &quot;{noteToDelete?.judul}&quot;?
               </p>
               <div className="grid grid-cols-2 border-t border-red-400/50">
                 <button
