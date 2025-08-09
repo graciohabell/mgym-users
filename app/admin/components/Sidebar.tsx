@@ -10,6 +10,13 @@ interface SidebarProps {
   onClose: () => void;
 }
 
+// Simbol minimalis sebagai komponen kecil
+function Icon() {
+  return (
+    <span className="inline-block w-3 h-3 mr-3 bg-current rounded-sm flex-shrink-0" />
+  );
+}
+
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
@@ -17,6 +24,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const handleLogout = () => {
     router.push('/');
   };
+
+  const linkClass =
+    'block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white active:bg-white/20 active:text-white font-medium transition-colors font-[Plus Jakarta Sans] flex items-center';
 
   return (
     <>
@@ -35,32 +45,37 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </div>
 
               <nav className="p-2 rounded-lg space-x-0">
-                <Link href="/admin/add-member" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
-                  ☰ Tambah
+                <Link href="/admin/add-member" className={linkClass}>
+                  <Icon />
+                  Tambah
                 </Link>
-                <Link href="/admin/members" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
-                  ☰ Member
+                <Link href="/admin/members" className={linkClass}>
+                  <Icon />
+                  Member
                 </Link>
-                <Link href="/admin/booking" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
-                  ☰ Jadwal Trainer
+                <Link href="/admin/booking" className={linkClass}>
+                  <Icon />
+                  Jadwal Trainer
                 </Link>
-                <Link href="/admin/statistik" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
-                  ☰ Statistik
+                <Link href="/admin/statistik" className={linkClass}>
+                  <Icon />
+                  Statistik
                 </Link>
-                <Link href="/admin/testimoni" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
-                  ☰ Testimoni
+                <Link href="/admin/testimoni" className={linkClass}>
+                  <Icon />
+                  Testimoni
                 </Link>
-                <Link href="/admin/notes" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
-                  ☰ Catatan
+                <Link href="/admin/notes" className={linkClass}>
+                  <Icon />
+                  Catatan
                 </Link>
-                
               </nav>
             </div>
 
             <div className="p-2 border-t border-white/10">
               <button
                 onClick={() => setShowConfirm(true)}
-                className="block w-full text-center text-white/40 hover:bg-white/10 hover:text-white font-medium px-3 py-2 rounded-sm transition-colors font-[Plus Jakarta Sans]"
+                className="block w-full text-center text-white/40 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white active:bg-white/20 active:text-white font-medium px-3 py-2 rounded-sm transition-colors font-[Plus Jakarta Sans]"
               >
                 Logout
               </button>
@@ -69,7 +84,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       </AnimatePresence>
 
-      {/* Pop Up Logout */}
       <AnimatePresence>
         {showConfirm && (
           <motion.div
