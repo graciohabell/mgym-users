@@ -19,6 +19,17 @@ export default function MembersList() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+  // Untuk edit
+  const [editMember, setEditMember] = useState<Member | null>(null);
+  const [editForm, setEditForm] = useState({
+    nama: '',
+    email: '',
+    no_hp: '',
+    tgl_daftar: '',
+    tgl_berakhir: '',
+  });
+  const [editError, setEditError] = useState('');
+
   useEffect(() => {
     fetchMembers();
   }, []);
@@ -44,13 +55,77 @@ export default function MembersList() {
     }
   };
 
+  const openEdit = (member: Member) => {
+    setEditMember(member);
+    setEditForm({
+      nama: member.nama,
+      email: member.email,
+      no_hp: member.no_hp,
+      tgl_daftar: member.tgl_daftar,
+      tgl_berakhir: member.tgl_berakhir,
+    });
+    setEditError('');
+  };
+
+  const handleEditChange = (field: keyof typeof editForm, value: string) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEditError('');
+
+    // Validasi sederhana
+    if (
+      !editForm.nama.trim() ||
+      !editForm.email.trim() ||
+      !editForm.no_hp.trim() ||
+      !editForm.tgl_daftar.trim() ||
+      !editForm.tgl_berakhir.trim()
+    ) {
+      setEditError('Semua field wajib diisi ya!');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('members')
+      .update({
+        nama: editForm.nama,
+        email: editForm.email,
+        no_hp: editForm.no_hp,
+        tgl_daftar: editForm.tgl_daftar,
+        tgl_berakhir: editForm.tgl_berakhir,
+      })
+      .eq('id', editMember!.id);
+
+    if (!error) {
+      setMembers((prev) =>
+        prev.map((m) =>
+          m.id === editMember!.id
+            ? {
+                ...m,
+                nama: editForm.nama,
+                email: editForm.email,
+                no_hp: editForm.no_hp,
+                tgl_daftar: editForm.tgl_daftar,
+                tgl_berakhir: editForm.tgl_berakhir,
+              }
+            : m
+        )
+      );
+      setEditMember(null);
+    } else {
+      setEditError('Gagal update member.');
+    }
+  };
+
   const filteredMembers = members.filter((m) =>
     m.nama.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
   return (
     <div className="max-w-6xl mx-auto p-6 font-sans bg-black/50 min-h-screen">
-      <h2 className="text-4xl font-semibold italic mb-8 font-[Plus Jakarta Sans] bg-red-700 text-transparent bg-clip-text">
+      <h2 className="text-3xl font-semibold italic mb-8 font-[Plus Jakarta Sans] bg-red-700 text-transparent bg-clip-text">
         TABEL DAFTAR MEMBERSHIP
       </h2>
 
@@ -123,7 +198,7 @@ export default function MembersList() {
                   <td className="px-4 py-3 whitespace-nowrap space-x-2">
                     <button
                       className=" text-white/50 hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300 "
-                      onClick={() => alert('Edit belum aktif')}
+                      onClick={() => openEdit(m)}
                     >
                       EDIT
                     </button>
@@ -141,33 +216,114 @@ export default function MembersList() {
         </div>
       )}
 
-{confirmDeleteId && (
-  <div className="fixed inset-0 flex justify-center items-center z-50 ">
-    <div
-      className=" bg-red-600 text-white rounded-lg shadow-lg w-60 text-center p-4 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards]"
-    >
-      <h3 className="text-lg font-semibold text-white mb-2">Hapus ?</h3>
-      <p className="text-gray-300 mb-2">
-        Yakin menghapus member ini?
-      </p>
-      <div className="grid grid-cols-2 border-t rounded-2xl border-red-900/50">
-        <button
-          onClick={() => setConfirmDeleteId(null)}
-          className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={() => handleDelete(confirmDeleteId)}
-          className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors border-l border-red-900/50"
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      {/* Pop Up Delete Confirmation */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 flex justify-center items-center z-50 ">
+          <div
+            className=" bg-red-600 text-white rounded-lg shadow-lg w-60 text-center p-4 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards]"
+          >
+            <h3 className="text-lg font-semibold text-white mb-2">Hapus ?</h3>
+            <p className="text-gray-300 mb-2">
+              Yakin menghapus member ini?
+            </p>
+            <div className="grid grid-cols-2 border-t rounded-2xl border-red-900/50">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(confirmDeleteId)}
+                className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors border-l border-red-900/50"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* Pop Up Edit Member */}
+      {editMember && (
+        <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/60 p-4">
+          <div className="bg-black border border-white/10 rounded-lg shadow-lg w-full max-w-md p-6 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards] font-[Plus Jakarta Sans]">
+            <h3 className="text-xl font-semibold text-red-600 mb-4 text-center">
+              Edit Member
+            </h3>
+            <form onSubmit={handleEditSubmit} className="space-y-4 text-white text-sm">
+              <div>
+                <label className="block mb-1">Nama:</label>
+                <input
+                  type="text"
+                  value={editForm.nama}
+                  onChange={(e) => handleEditChange('nama', e.target.value)}
+                  className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Email:</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => handleEditChange('email', e.target.value)}
+                  className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block mb-1">No HP:</label>
+                <input
+                  type="text"
+                  value={editForm.no_hp}
+                  onChange={(e) => handleEditChange('no_hp', e.target.value)}
+                  className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Tanggal Daftar:</label>
+                <input
+                  type="date"
+                  value={editForm.tgl_daftar}
+                  onChange={(e) => handleEditChange('tgl_daftar', e.target.value)}
+                  className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Tanggal Berakhir:</label>
+                <input
+                  type="date"
+                  value={editForm.tgl_berakhir}
+                  onChange={(e) => handleEditChange('tgl_berakhir', e.target.value)}
+                  className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
+                  required
+                />
+              </div>
+              {editError && (
+                <p className="text-red-500 text-center">{editError}</p>
+              )}
+              <div className="flex justify-between mt-6">
+                <button
+                  type="button"
+                  onClick={() => setEditMember(null)}
+                  className="px-4 py-2 bg-red-700 rounded-md hover:bg-red-800 transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

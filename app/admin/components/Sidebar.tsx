@@ -39,7 +39,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   ☰ Tambah
                 </Link>
                 <Link href="/admin/members" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
-                  ☰ Database
+                  ☰ Member
+                </Link>
+                <Link href="/admin/booking" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
+                  ☰ Jadwal Trainer
                 </Link>
                 <Link href="/admin/statistik" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
                   ☰ Statistik
@@ -50,6 +53,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <Link href="/admin/notes" className="block px-4 py-2 rounded-sm text-white/40 hover:bg-white/10 hover:text-white font-medium transition-colors font-[Plus Jakarta Sans]">
                   ☰ Catatan
                 </Link>
+                
               </nav>
             </div>
 
@@ -75,7 +79,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             transition={{ duration: 0.2 }}
             className="fixed inset-0 flex justify-center items-center z-[60] pointer-events-none"
           >
-            <div className="bg-red-600 rounded-2xl shadow-lg shadow-black/30 w-80 text-center p-6 pointer-events-auto">
+            <div className="bg-red-600 rounded-lg shadow-lg shadow-black/30 w-80 text-center p-6 pointer-events-auto">
               <h3 className="text-sm font-semibold text-white mb-2 font-[Plus Jakarta Sans]">
                 Logout?
               </h3>

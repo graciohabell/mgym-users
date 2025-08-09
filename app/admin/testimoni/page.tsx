@@ -68,7 +68,7 @@ export default function AdminTestimonialsPage() {
       className="min-h-screen bg-black text-white p-6 font-sans"
       style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
     >
-      <h1 className="text-3xl font-semibold italic mb-6 text-red-700">
+      <h1 className="text-2xl font-semibold italic mb-6 text-red-700">
         DATABASE TESTIMONI
       </h1>
 
