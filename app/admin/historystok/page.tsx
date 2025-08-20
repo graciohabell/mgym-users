@@ -12,18 +12,14 @@ interface HistoryItem {
   created_at: string;
 }
 
-
-interface SupabaseBarang {
-  nama: string;
-  kategori: string;
-}
-
-
-interface SupabaseRow {
+interface SupabaseBarangRow {
   id: string;
   jumlah: number;
   created_at: string;
-  barang: SupabaseBarang;
+  barang: {
+    nama: string;
+    kategori: string;
+  };
 }
 
 export default function HistoryBarang() {
@@ -47,36 +43,31 @@ export default function HistoryBarang() {
       .select('id,jumlah,created_at,barang(nama,kategori)')
       .order('created_at', { ascending: false });
 
-    
     const merged: HistoryItem[] = [];
 
     if (masukData) {
-      masukData.forEach((m: any) => {
-        if (m.barang && typeof m.jumlah === 'number') {
-          merged.push({
-            id: m.id,
-            nama: m.barang.nama,
-            kategori: m.barang.kategori,
-            jumlah: m.jumlah,
-            tipe: 'MASUK',
-            created_at: m.created_at,
-          });
-        }
+      (masukData as any[]).forEach((m) => {
+        merged.push({
+          id: m.id,
+          nama: m.barang.nama,
+          kategori: m.barang.kategori,
+          jumlah: m.jumlah,
+          tipe: 'MASUK',
+          created_at: m.created_at,
+        });
       });
     }
 
     if (keluarData) {
-      keluarData.forEach((k: any) => {
-        if (k.barang && typeof k.jumlah === 'number') {
-          merged.push({
-            id: k.id,
-            nama: k.barang.nama,
-            kategori: k.barang.kategori,
-            jumlah: k.jumlah,
-            tipe: 'KELUAR',
-            created_at: k.created_at,
-          });
-        }
+      (keluarData as any[]).forEach((k) => {
+        merged.push({
+          id: k.id,
+          nama: k.barang.nama,
+          kategori: k.barang.kategori,
+          jumlah: k.jumlah,
+          tipe: 'KELUAR',
+          created_at: k.created_at,
+        });
       });
     }
 
