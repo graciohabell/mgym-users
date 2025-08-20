@@ -12,6 +12,14 @@ interface HistoryItem {
   created_at: string;
 }
 
+
+interface SupabaseBarangRow {
+  id: string;
+  jumlah: number;
+  created_at: string;
+  barang: { nama: string; kategori: string }[]; 
+}
+
 export default function HistoryBarang() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,38 +31,45 @@ export default function HistoryBarang() {
   const fetchHistory = async () => {
     setLoading(true);
 
-    
     const { data: masukData } = await supabase
-      .from('barang_masuk')
+      .from<'barang_masuk', SupabaseBarangRow>('barang_masuk')
       .select('id,jumlah,created_at,barang(nama,kategori)')
       .order('created_at', { ascending: false });
 
     const { data: keluarData } = await supabase
-      .from('barang_keluar')
+      .from<'barang_keluar', SupabaseBarangRow>('barang_keluar')
       .select('id,jumlah,created_at,barang(nama,kategori)')
       .order('created_at', { ascending: false });
 
     if (masukData && keluarData) {
       const merged: HistoryItem[] = [
-        ...masukData.map((m: any) => ({
-          id: m.id,
-          nama: m.barang.nama,
-          kategori: m.barang.kategori,
-          jumlah: m.jumlah,
-          tipe: 'MASUK' as const,
-          created_at: m.created_at,
-        })),
-        ...keluarData.map((k: any) => ({
-          id: k.id,
-          nama: k.barang.nama,
-          kategori: k.barang.kategori,
-          jumlah: k.jumlah,
-          tipe: 'KELUAR' as const,
-          created_at: k.created_at,
-        })),
+        ...masukData
+          .filter((m) => m.barang.length > 0)
+          .map((m) => ({
+            id: m.id,
+            nama: m.barang[0].nama,
+            kategori: m.barang[0].kategori,
+            jumlah: m.jumlah,
+            tipe: 'MASUK' as const,
+            created_at: m.created_at,
+          })),
+        ...keluarData
+          .filter((k) => k.barang.length > 0)
+          .map((k) => ({
+            id: k.id,
+            nama: k.barang[0].nama,
+            kategori: k.barang[0].kategori,
+            jumlah: k.jumlah,
+            tipe: 'KELUAR' as const,
+            created_at: k.created_at,
+          })),
       ];
 
-      merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      merged.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
       setHistory(merged);
     }
 
@@ -74,22 +89,38 @@ export default function HistoryBarang() {
           <table className="w-full text-left">
             <thead className="bg-white/10">
               <tr>
-                {['Nama', 'Kategori', 'Jumlah', 'Tipe', 'Waktu'].map((header) => (
-                  <th key={header} className="px-4 py-2 border-b border-white/10 text-xs uppercase text-gray-200">
-                    {header}
-                  </th>
-                ))}
+                {['Nama', 'Kategori', 'Jumlah', 'Tipe', 'Waktu'].map(
+                  (header) => (
+                    <th
+                      key={header}
+                      className="px-4 py-2 border-b border-white/10 text-xs uppercase text-gray-200"
+                    >
+                      {header}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10 bg-black">
               {history.map((h) => (
-                <tr key={h.id} className="hover:bg-white/10 transition-all duration-200">
+                <tr
+                  key={h.id}
+                  className="hover:bg-white/10 transition-all duration-200"
+                >
                   <td className="px-4 py-2 text-gray-300">{h.nama}</td>
                   <td className="px-4 py-2 text-gray-400">{h.kategori}</td>
-                  <td className={`px-4 py-2 ${h.tipe === 'MASUK' ? 'text-green-400' : 'text-red-400'}`}>{h.jumlah}</td>
+                  <td
+                    className={`px-4 py-2 ${
+                      h.tipe === 'MASUK' ? 'text-green-400' : 'text-red-400'
+                    }`}
+                  >
+                    {h.jumlah}
+                  </td>
                   <td className="px-4 py-2">{h.tipe}</td>
                   <td className="px-4 py-2">
-                    {new Date(h.created_at).toLocaleString('id-ID', { hour12: false })}
+                    {new Date(h.created_at).toLocaleString('id-ID', {
+                      hour12: false,
+                    })}
                   </td>
                 </tr>
               ))}
