@@ -23,13 +23,12 @@ export default function HistoryBarang() {
   const fetchHistory = async () => {
     setLoading(true);
 
- 
+    
     const { data: masukData } = await supabase
       .from('barang_masuk')
       .select('id,jumlah,created_at,barang(nama,kategori)')
       .order('created_at', { ascending: false });
 
-   
     const { data: keluarData } = await supabase
       .from('barang_keluar')
       .select('id,jumlah,created_at,barang(nama,kategori)')
@@ -55,9 +54,7 @@ export default function HistoryBarang() {
         })),
       ];
 
-      
       merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
       setHistory(merged);
     }
 
@@ -78,7 +75,9 @@ export default function HistoryBarang() {
             <thead className="bg-white/10">
               <tr>
                 {['Nama', 'Kategori', 'Jumlah', 'Tipe', 'Waktu'].map((header) => (
-                  <th key={header} className="px-4 py-2 border-b border-white/10 text-xs uppercase text-gray-200">{header}</th>
+                  <th key={header} className="px-4 py-2 border-b border-white/10 text-xs uppercase text-gray-200">
+                    {header}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -89,7 +88,9 @@ export default function HistoryBarang() {
                   <td className="px-4 py-2 text-gray-400">{h.kategori}</td>
                   <td className={`px-4 py-2 ${h.tipe === 'MASUK' ? 'text-green-400' : 'text-red-400'}`}>{h.jumlah}</td>
                   <td className="px-4 py-2">{h.tipe}</td>
-                  <td className="px-4 py-2">{new Date(h.created_at).toLocaleString('id-ID', { hour12: false })}</td>
+                  <td className="px-4 py-2">
+                    {new Date(h.created_at).toLocaleString('id-ID', { hour12: false })}
+                  </td>
                 </tr>
               ))}
             </tbody>
