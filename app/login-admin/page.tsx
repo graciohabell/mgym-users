@@ -13,7 +13,6 @@ export default function AdminLogin() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validasi form kosong
     if (!username.trim()) {
       setErrorMsg('Username Admin wajib diisi.');
       return;
@@ -35,16 +34,13 @@ export default function AdminLogin() {
       return;
     }
 
-    // Simpan session lokal
     localStorage.setItem('admin_login', 'true');
-
-    // Redirect ke halaman admin
     router.push('/admin/members');
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black/40 p-4 relative">
-      <div className="p-6 rounded-lg w-full max-w-sm text-center">
+      <div className="p-6 rounded-lg w-full max-w-sm text-center bg-black/20">
         <h1
           className="text-2xl font-semibold italic text-white mb-4"
           style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
@@ -56,20 +52,25 @@ export default function AdminLogin() {
           <input
             type="text"
             placeholder="Username Admin"
-            className="border px-4 py-2 text-white rounded-md bg-black/20 border-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
+            className="border px-4 py-2 text-white rounded-md bg-black/20 border-neutral-400
+                       focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
           <input
             type="password"
             placeholder="Password Admin"
-            className="border px-4 py-2 text-white rounded-md bg-black/20 border-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
+            className="border px-4 py-2 text-white rounded-md bg-black/20 border-neutral-400
+                       focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <button
             type="submit"
-            className="bg-red-600 font-semibold text-white py-2 rounded-lg hover:bg-white hover:text-red-600 transition"
+            className="bg-red-600 font-semibold text-white py-2 rounded-lg
+                       hover:bg-red-500 hover:text-white
+                       focus:bg-red-500 focus:ring-2 focus:ring-red-400
+                       active:bg-red-700 active:text-white transition-colors"
             style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
           >
             Login
@@ -89,7 +90,10 @@ export default function AdminLogin() {
             <div className="border-t border-red-500">
               <button
                 onClick={() => setErrorMsg('')}
-                className="w-full py-3 font-medium hover:rounded-lg hover:bg-red-700 transition-colors"
+                className="w-full py-3 font-medium
+                           hover:bg-red-700
+                           focus:bg-red-700 focus:ring-2 focus:ring-red-400
+                           active:bg-red-800 rounded-lg transition-colors"
               >
                 OK
               </button>

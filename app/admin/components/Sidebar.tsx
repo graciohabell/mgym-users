@@ -4,17 +4,16 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import 'bootstrap-icons/font/bootstrap-icons.css'; // pastiin udah diinstall npm i bootstrap-icons
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Simbol minimalis sebagai komponen kecil
-function Icon() {
-  return (
-    <span className="inline-block w-3 h-3 mr-3 bg-current rounded-sm flex-shrink-0" />
-  );
+// Icon wrapper
+function SidebarIcon({ iconClass }: { iconClass: string }) {
+  return <i className={`bi ${iconClass} w-4 h-4 mr-3 flex-shrink-0 text-white/60`}></i>;
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -46,27 +45,31 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
               <nav className="p-2 rounded-lg space-x-0">
                 <Link href="/admin/add-member" className={linkClass}>
-                  <Icon />
-                  Tambah
+                  <SidebarIcon iconClass="bi-person-plus" />
+                  Tambah Member
+                </Link>
+                <Link href="/admin/listbarang" className={linkClass}>
+                  <SidebarIcon iconClass="bi-box-seam" />
+                  Stok Barang
                 </Link>
                 <Link href="/admin/members" className={linkClass}>
-                  <Icon />
-                  Member
+                  <SidebarIcon iconClass="bi-people" />
+                  List Member
                 </Link>
                 <Link href="/admin/booking" className={linkClass}>
-                  <Icon />
+                  <SidebarIcon iconClass="bi-calendar-check" />
                   Jadwal Trainer
                 </Link>
                 <Link href="/admin/statistik" className={linkClass}>
-                  <Icon />
+                  <SidebarIcon iconClass="bi-graph-up" />
                   Statistik
                 </Link>
                 <Link href="/admin/testimoni" className={linkClass}>
-                  <Icon />
+                  <SidebarIcon iconClass="bi-chat-left-quote" />
                   Testimoni
                 </Link>
                 <Link href="/admin/notes" className={linkClass}>
-                  <Icon />
+                  <SidebarIcon iconClass="bi-journal-text" />
                   Catatan
                 </Link>
               </nav>

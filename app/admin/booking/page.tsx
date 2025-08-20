@@ -7,8 +7,8 @@ import '../../globals.css';
 interface BookingFromDB {
   id: string;
   member_id: string;
-  members: { nama: string }[]; 
-  trainer_list: { nama: string }[]; 
+  members: { nama: string }[];
+  trainer_list: { nama: string }[];
   tanggal: string;
   jam: string;
   status: string;
@@ -31,6 +31,7 @@ export default function BookingList() {
   const [loading, setLoading] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [popup, setPopup] = useState<{ action: string; id: string } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     fetchBookings();
@@ -70,22 +71,23 @@ export default function BookingList() {
   };
 
   const updateStatus = async (id: string, newStatus: 'approved' | 'rejected') => {
+    setActionLoading(true);
     const { error } = await supabase
       .from('bookings')
       .update({ status: newStatus })
       .eq('id', id);
 
     if (!error) {
-      setBookings((prev) =>
-        prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b))
-      );
+      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b)));
     } else {
       alert('Gagal mengubah status booking.');
     }
     setPopup(null);
+    setActionLoading(false);
   };
 
   const deleteBooking = async (id: string) => {
+    setActionLoading(true);
     const { error } = await supabase.from('bookings').delete().eq('id', id);
 
     if (!error) {
@@ -94,6 +96,7 @@ export default function BookingList() {
       alert('Gagal menghapus booking.');
     }
     setPopup(null);
+    setActionLoading(false);
   };
 
   const filteredBookings = bookings.filter((b) =>
@@ -126,23 +129,13 @@ export default function BookingList() {
           </div>
         </div>
       ) : filteredBookings.length === 0 ? (
-        <p className="text-gray-400 font-[Plus Jakarta Sans]">
-          Booking tidak ditemukan.
-        </p>
+        <p className="text-gray-400 font-[Plus Jakarta Sans]">Booking tidak ditemukan.</p>
       ) : (
         <div className="overflow-x-auto rounded-md border border-white/10">
           <table className="w-full text-left font-[Plus Jakarta Sans]">
             <thead className="bg-white/10">
               <tr>
-                {[
-                  'Nama Member',
-                  'Trainer',
-                  'Tanggal',
-                  'Jam',
-                  'Status',
-                  'Dibuat',
-                  'Aksi'
-                ].map((header) => (
+                {['Nama Member','Trainer','Tanggal','Jam','Status','Dibuat','Aksi'].map((header) => (
                   <th
                     key={header}
                     className="px-4 py-3 uppercase tracking-wider text-white font-semibold border-b border-white/10 text-xs"
@@ -154,50 +147,32 @@ export default function BookingList() {
             </thead>
             <tbody className="divide-y divide-white/10 bg-black">
               {filteredBookings.map((b) => (
-                <tr
-                  key={b.id}
-                  className="hover:bg-white/10 transition-all duration-300 group"
-                >
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-300 text-sm">
-                    {b.member_nama}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
-                    {b.trainer_nama}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
-                    {b.tanggal}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
-                    {b.jam}
-                  </td>
-                  <td
-                    className={`px-4 py-3 whitespace-nowrap text-sm font-semibold ${
-                      b.status === 'approved'
-                        ? 'text-green-400'
-                        : b.status === 'rejected'
-                        ? 'text-red-400'
-                        : 'text-yellow-400'
-                    }`}
-                  >
-                    {b.status}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-500 text-sm">
-                    {new Date(b.created_at).toLocaleString('id-ID')}
-                  </td>
+                <tr key={b.id} className="hover:bg-white/10 transition-all duration-300 group">
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-300 text-sm">{b.member_nama}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">{b.trainer_nama}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">{b.tanggal}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">{b.jam}</td>
+                  <td className={`px-4 py-3 whitespace-nowrap text-sm font-semibold ${
+                    b.status==='approved' ? 'text-green-400' : b.status==='rejected' ? 'text-red-400' : 'text-yellow-400'
+                  }`}>{b.status}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-500 text-sm">{new Date(b.created_at).toLocaleString('id-ID')}</td>
                   <td className="px-4 py-3 whitespace-nowrap space-x-2">
                     <button
+                      disabled={actionLoading}
                       onClick={() => setPopup({ action: 'approve', id: b.id })}
                       className="text-green-500 font-semibold hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300"
                     >
                       approve
                     </button>
                     <button
+                      disabled={actionLoading}
                       onClick={() => setPopup({ action: 'reject', id: b.id })}
                       className="text-red-500 font-semibold hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300"
                     >
                       reject
                     </button>
                     <button
+                      disabled={actionLoading}
                       onClick={() => setPopup({ action: 'delete', id: b.id })}
                       className="text-red-700 hover:text-white px-2 py-1 rounded-md text-xs transition-all duration-300 font-extrabold"
                     >
@@ -218,42 +193,31 @@ export default function BookingList() {
             style={{ animationFillMode: 'forwards' }}
           >
             <h3 className="text-lg font-semibold text-white mb-2">
-              {popup.action === 'approve'
-                ? 'Setujui Booking Ini?'
-                : popup.action === 'reject'
-                ? 'Tolak Booking Ini?'
-                : 'Hapus Booking Ini?'}
+              {popup.action==='approve' ? 'Setujui Booking Ini?' : popup.action==='reject' ? 'Tolak Booking Ini?' : 'Hapus Booking Ini?'}
             </h3>
             <p className="text-gray-300 mb-2">
-              {popup.action === 'delete'
-                ? 'Yakin menghapus booking ini?'
-                : 'Yakin mengubah status booking ini?'}
+              {popup.action==='delete' ? 'Yakin menghapus booking ini?' : 'Yakin mengubah status booking ini?'}
             </p>
             <div className="grid grid-cols-2 border-t rounded-2xl border-red-900/50">
+              <button onClick={()=>setPopup(null)} className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors">Cancel</button>
               <button
-                onClick={() => setPopup(null)}
-                className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  if (popup.action === 'approve') updateStatus(popup.id, 'approved');
-                  if (popup.action === 'reject') updateStatus(popup.id, 'rejected');
-                  if (popup.action === 'delete') deleteBooking(popup.id);
+                onClick={()=>{
+                  if(popup.action==='approve') updateStatus(popup.id,'approved');
+                  if(popup.action==='reject') updateStatus(popup.id,'rejected');
+                  if(popup.action==='delete') deleteBooking(popup.id);
                 }}
                 className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors border-l border-red-900/50"
               >
-                {popup.action === 'delete'
-                  ? 'Delete'
-                  : popup.action === 'approve'
-                  ? 'Ya, Setujui'
-                  : 'Ya, Tolak'}
+                {popup.action==='delete' ? 'Delete' : popup.action==='approve' ? 'Ya, Setujui' : 'Ya, Tolak'}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        @keyframes popIn { from { transform: scale(0.95); opacity:0 } to { transform: scale(1); opacity:1 } }
+      `}</style>
     </div>
   );
 }

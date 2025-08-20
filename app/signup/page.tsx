@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -24,17 +24,14 @@ export default function SignUpPage() {
     e.preventDefault()
     setModalMsg('')
 
-    // Cek kalau ada form yang kosong
     if (!nama || !noHp || !email || !username || !password || !confirmPassword) {
       return showModal('Semua field wajib diisi.', 'error')
     }
 
-    // Cek konfirmasi password
     if (password !== confirmPassword) {
       return showModal('Password tidak sama.', 'error')
     }
 
-    // Cek username sudah dipakai atau belum
     const { data: takenUsername } = await supabase
       .from('members')
       .select('id')
@@ -45,7 +42,6 @@ export default function SignUpPage() {
       return showModal('Username sudah digunakan.', 'error')
     }
 
-    // Cek email + no HP sudah terdaftar
     const { data: existingMember, error: fetchError } = await supabase
       .from('members')
       .select('id, username, password')
@@ -61,7 +57,6 @@ export default function SignUpPage() {
       return showModal('Akun sudah pernah dibuat. Silakan login.', 'error')
     }
 
-    // Update username & password
     const { error: updateError } = await supabase
       .from('members')
       .update({
@@ -75,9 +70,7 @@ export default function SignUpPage() {
     }
 
     showModal('Berhasil daftar! Silakan login.', 'success')
-    setTimeout(() => {
-      router.push('/login')
-    }, 1500)
+    setTimeout(() => router.push('/login'), 1500)
   }
 
   return (
@@ -95,39 +88,48 @@ export default function SignUpPage() {
           className="space-y-4 text-white"
           style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
         >
-          <input type="text" placeholder="Nama" value={nama} onChange={(e) => setNama(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
-          />
-          <input type="tel" placeholder="No HP" value={noHp} onChange={(e) => setNoHp(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
-          />
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
-          />
-          <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
-          />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
-          />
-          <input type="password" placeholder="Konfirmasi Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
-          />
+          {['Nama', 'No HP', 'Email', 'Username', 'Password', 'Konfirmasi Password'].map((label, i) => (
+            <input
+              key={i}
+              type={label.includes('Password') ? 'password' : label === 'No HP' ? 'tel' : label === 'Email' ? 'email' : 'text'}
+              placeholder={label}
+              value={
+                label === 'Nama' ? nama :
+                label === 'No HP' ? noHp :
+                label === 'Email' ? email :
+                label === 'Username' ? username :
+                label === 'Password' ? password : confirmPassword
+              }
+              onChange={(e) => {
+                if (label === 'Nama') setNama(e.target.value)
+                else if (label === 'No HP') setNoHp(e.target.value)
+                else if (label === 'Email') setEmail(e.target.value)
+                else if (label === 'Username') setUsername(e.target.value)
+                else if (label === 'Password') setPassword(e.target.value)
+                else setConfirmPassword(e.target.value)
+              }}
+              className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 
+                         focus:outline-none focus:ring-2 focus:ring-red-400 
+                         active:ring-2 active:ring-red-600 transition"
+            />
+          ))}
 
           <button
             type="submit"
-            className="w-full py-2 rounded-lg bg-red-600 hover:text-red-600 text-white hover:bg-white font-semibold transition-colors duration-200"
+            className="w-full py-2 rounded-lg bg-red-600 text-white font-semibold
+                       hover:bg-white hover:text-red-600
+                       focus:bg-red-500 focus:ring-2 focus:ring-red-400
+                       active:bg-red-700 transition-colors duration-200"
           >
             Daftar
           </button>
         </form>
 
-        <p className="text-sm md:text-base text-neutral-700 max-w-md font-body mt-2 leading-relaxed">
+        <p className="text-sm md:text-base text-neutral-200 max-w-md font-body mt-2 leading-relaxed">
           Tetap ingat username dan password yang saat ini kamu daftarkan/sign-up untuk login/mengakses Member Reminder.
         </p>
       </div>
 
-      {/* Modal */}
       {modalMsg && (
         <div className="fixed inset-0 flex justify-center items-center z-50 pointer-events-none">
           <div

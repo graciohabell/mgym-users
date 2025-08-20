@@ -190,7 +190,7 @@ export default function MemberOnlyPage() {
     <main className="min-h-screen w-full bg-white px-4 pt-28 font-semibold pb-20 text-black/70 font-body">
       <motion.div className="w-full max-w-md mx-auto bg-white/70 border border-red-100 rounded-2xl p-8 shadow-md text-center backdrop-blur-sm">
         <h1
-          className="text-2xl  font-display italic font-extrabold text-red-600 tracking-wide mb-4"
+          className="text-2xl font-display italic font-extrabold text-red-600 tracking-wide mb-4"
           style={{ fontFamily: 'Tomorrow, sans-serif', fontStyle: 'italic' }}
         >
           M.GYM
@@ -220,18 +220,21 @@ export default function MemberOnlyPage() {
             type="date"
             value={tanggal}
             onChange={(e) => setTanggal(e.target.value)}
-            className="w-full text-black/70 p-2 border border-black/50 rounded-md"
+            className="w-full text-black/70 p-2 border border-black/50 rounded-md
+                       focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
           />
           <input
             type="time"
             value={jam}
             onChange={(e) => setJam(e.target.value)}
-            className="w-full text-black/70 p-2 border border-black/50 rounded-md"
+            className="w-full text-black/70 p-2 border border-black/50 rounded-md
+                       focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
           />
           <select
             value={trainerId}
             onChange={(e) => setTrainerId(e.target.value)}
-            className="w-full text-black/70 border border-black/50 p-2 rounded-md"
+            className="w-full text-black/70 border border-black/50 p-2 rounded-md
+                       focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
           >
             <option value="">Pilih Trainer</option>
             {trainers.map((t) => (
@@ -242,7 +245,10 @@ export default function MemberOnlyPage() {
           </select>
           <button
             type="submit"
-            className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-white hover:text-red-600 transition"
+            className="w-full bg-red-600 text-white py-2 rounded-md
+                       hover:bg-white hover:text-red-600
+                       focus:bg-red-500 focus:ring-2 focus:ring-red-400
+                       active:bg-red-700 transition-colors"
           >
             Booking
           </button>
@@ -287,7 +293,8 @@ export default function MemberOnlyPage() {
               value={testimoni}
               onChange={(e) => setTestimoni(e.target.value)}
               placeholder="Tulis sudut pandang kamu terhadap M.GYM..."
-              className="text-md w-full p-3 border border-gray-300 text-black rounded-md focus:outline-none focus:ring focus:border-red-300"
+              className="text-md w-full p-3 border border-gray-300 text-black rounded-md
+                         focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
               rows={4}
             />
             <div>
@@ -295,7 +302,8 @@ export default function MemberOnlyPage() {
               <select
                 value={rating}
                 onChange={(e) => setRating(Number(e.target.value))}
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md
+                           focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
               >
                 <option value={5}>⭐⭐⭐⭐⭐ (5)</option>
                 <option value={4}>⭐⭐⭐⭐ (4)</option>
@@ -306,7 +314,10 @@ export default function MemberOnlyPage() {
             </div>
             <button
               type="submit"
-              className="text-sm mt-2 w-full bg-red-600 text-white py-2 rounded-md hover:bg-white hover:text-red-600 transition"
+              className="text-sm mt-2 w-full bg-red-600 text-white py-2 rounded-md
+                         hover:bg-white hover:text-red-600
+                         focus:bg-red-500 focus:ring-2 focus:ring-red-400
+                         active:bg-red-700 transition-colors"
             >
               Kirim
             </button>

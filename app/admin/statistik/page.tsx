@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Line, Pie } from 'react-chartjs-2';
+import { Line, Pie, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   ArcElement,
   LineElement,
+  BarElement,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -19,6 +20,7 @@ import dayjs from 'dayjs';
 ChartJS.register(
   ArcElement,
   LineElement,
+  BarElement,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -26,6 +28,19 @@ ChartJS.register(
   Legend,
   ChartDataLabels
 );
+
+interface BarangKeluar {
+  id: string;
+  barang_id: string;
+  jumlah: number;
+  tanggal: string;
+}
+
+interface Barang {
+  id: string;
+  nama: string;
+  kategori: string;
+}
 
 export default function AnalyticsPage() {
   const [stats, setStats] = useState({
@@ -35,6 +50,7 @@ export default function AnalyticsPage() {
     testimoniBulanIni: 0,
     pertumbuhanBulanan: [] as number[],
     ratingCounts: [0, 0, 0, 0, 0],
+    kategoriData: {} as Record<string, number[]>, // key: kategori, value: array jumlah barang keluar per bulan
   });
 
   const bulanLabels = Array.from({ length: 12 }, (_, i) =>
@@ -48,6 +64,7 @@ export default function AnalyticsPage() {
       const startOfMonth = today.startOf('month').toISOString();
       const sevenDaysLater = today.add(7, 'day').toISOString();
 
+      // --- MEMBER DATA ---
       const { data: allMembers } = await supabase.from('members').select('*');
       const aktif = (allMembers ?? []).filter((m) =>
         m.tgl_berakhir ? dayjs(m.tgl_berakhir).isAfter(today) : false
@@ -60,6 +77,7 @@ export default function AnalyticsPage() {
           dayjs(m.tgl_berakhir).isBefore(sevenDaysLater)
       ).length;
 
+      // --- TESTIMONI DATA ---
       const { count: testimoniBulanIni } = await supabase
         .from('testimonials')
         .select('*', { count: 'exact', head: true })
@@ -77,6 +95,7 @@ export default function AnalyticsPage() {
         }
       });
 
+      // --- PERTUMBUHAN MEMBER BULANAN ---
       const pertumbuhanBulanan = await Promise.all(
         bulanLabels.map(async (_, i) => {
           const start = dayjs()
@@ -96,6 +115,29 @@ export default function AnalyticsPage() {
         })
       );
 
+      // --- BARANG & BARANG KELUAR ---
+      const { data: allBarang } = await supabase.from('barang').select('id,kategori');
+      const { data: allBarangKeluar } = await supabase
+        .from('barang_keluar')
+        .select('*'); // pastikan ada kolom: barang_id, jumlah, tanggal_keluar
+
+      const kategoriData: Record<string, number[]> = {};
+      (allBarang ?? []).forEach((b) => {
+        kategoriData[b.kategori] = Array(12).fill(0);
+      });
+
+      (allBarangKeluar ?? []).forEach((bk: BarangKeluar) => {
+        const barang = allBarang?.find((b) => b.id === bk.barang_id);
+        if (!barang) return;
+        const bulanIndex = bulanLabels.findIndex((label, i) => {
+          const bulan = dayjs().subtract(11 - i, 'month');
+          return dayjs(bk.tanggal).isSame(bulan, 'month');
+        });
+        if (bulanIndex >= 0) {
+          kategoriData[barang.kategori][bulanIndex] += bk.jumlah;
+        }
+      });
+
       setStats({
         aktif,
         nonAktif,
@@ -103,6 +145,7 @@ export default function AnalyticsPage() {
         testimoniBulanIni: Number(testimoniBulanIni) || 0,
         pertumbuhanBulanan,
         ratingCounts,
+        kategoriData,
       });
     };
 
@@ -140,157 +183,145 @@ export default function AnalyticsPage() {
         DASHBOARD STATISTIK M.GYM
       </h1>
 
+      {/* STATISTIK MEMBER */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatBox label="Total Data Member Aktif" value={stats.aktif} />
         <StatBox label="Total Data Member Non-Aktif" value={stats.nonAktif} />
-        <StatBox
-          label="Total Data Akan Non-Aktif dalam 7 Hari"
-          value={stats.expSoon}
-        />
+        <StatBox label="Total Data Akan Non-Aktif dalam 7 Hari" value={stats.expSoon} />
         <StatBox label="Total Testimoni" value={stats.testimoniBulanIni} />
       </div>
 
-      <div className="space-y-6">
+      {/* PERTUMBUHAN MEMBER */}
+      <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors mb-6">
+        <h2 className="text-md font-semibold italic text-red-700 mb-3">Pertumbuhan Member</h2>
+        <div className="h-64">
+          <Line
+            data={{
+              labels: bulanLabels,
+              datasets: [
+                {
+                  label: 'Member Baru',
+                  data: stats.pertumbuhanBulanan,
+                  borderColor: '#dc2626',
+                  backgroundColor: 'rgba(220, 38, 38, 0.08)',
+                  borderWidth: 2,
+                  pointBackgroundColor: '#dc2626',
+                  pointBorderColor: '#fff',
+                  pointRadius: 4,
+                  pointHoverRadius: 6,
+                  tension: 0.3,
+                  fill: true,
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10 } } },
+                y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true },
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {/* MEMBER & TESTIMONI PIE */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-          <h2 className="text-md font-semibold italic text-red-700 mb-3">
-            Pertumbuhan Member
-          </h2>
-          <div className="h-64">
-            <Line
-              data={{
-                labels: bulanLabels,
-                datasets: [
-                  {
-                    label: 'Member Baru',
-                    data: stats.pertumbuhanBulanan,
-                    borderColor: '#dc2626',
-                    backgroundColor: 'rgba(220, 38, 38, 0.08)',
-                    borderWidth: 2,
-                    pointBackgroundColor: '#dc2626',
-                    pointBorderColor: '#fff',
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    tension: 0.3,
-                    fill: true,
-                  },
-                ],
-              }}
+          <h2 className="text-sm italic font-semibold text-red-700 mb-2">Persentase Status Member</h2>
+          <div className="h-48">
+            <Pie
+              data={memberComparisonData}
               options={{
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                  x: {
-                    grid: {
-                      display: false,
-                      drawTicks: false,
-                      drawOnChartArea: false,
-                    },
-                    ticks: {
-                      color: '#9ca3af',
-                      font: { size: 10 },
+                plugins: {
+                  legend: { position: 'right', labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } } },
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => {
+                        const label = context.label || '';
+                        const value = Number(context.raw) || 0;
+                        const percentage = totalMembers ? Math.round((value / totalMembers) * 100) : 0;
+                        return `${label}: ${value} (${percentage}%)`;
+                      },
                     },
                   },
-                  y: {
-                    grid: {
-                      color: '#1f2937',
-                      drawTicks: false,
-                      drawOnChartArea: true,
-                    },
-                    ticks: { color: '#9ca3af', stepSize: 1 },
-                    beginAtZero: true,
-                  },
+                  datalabels: { display: false },
                 },
               }}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-            <h2 className="text-sm italic font-semibold text-red-700 mb-2">
-              Persentase Seluruh Status Member Dalam Database
-            </h2>
-            <div className="h-48">
-              <Pie
-                data={memberComparisonData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      position: 'right',
-                      labels: {
-                        color: '#f3f4f6',
-                        font: { family: "'Plus Jakarta Sans', sans-serif" },
+        <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
+          <h2 className="text-sm italic font-semibold text-red-700 mb-2">Persentase Rating Testimoni</h2>
+          <div className="h-48">
+            <Pie
+              data={ratingChartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'right', labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } } },
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => {
+                        const label = context.label || '';
+                        const value = Number(context.raw) || 0;
+                        const percentage = totalTestimoni ? Math.round((value / totalTestimoni) * 100) : 0;
+                        return `${label}: ${value} (${percentage}%)`;
                       },
                     },
-                    tooltip: {
-                      callbacks: {
-                        label: function (context) {
-                          const label = context.label || '';
-                          const value = Number(context.raw) || 0;
-                          const percentage = totalMembers
-                            ? Math.round((value / totalMembers) * 100)
-                            : 0;
-                          return `${label}: ${value} (${percentage}%)`;
-                        },
-                      },
-                    },
-                    datalabels: { display: false },
                   },
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-            <h2 className="text-sm italic font-semibold text-red-700 mb-2">
-              Persentase Seluruh Rating Testimoni Dalam Database
-            </h2>
-            <div className="h-48">
-              <Pie
-                data={ratingChartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      position: 'right',
-                      labels: {
-                        color: '#f3f4f6',
-                        font: { family: "'Plus Jakarta Sans', sans-serif" },
-                      },
-                    },
-                    tooltip: {
-                      callbacks: {
-                        label: function (context) {
-                          const label = context.label || '';
-                          const value = Number(context.raw) || 0;
-                          const percentage = totalTestimoni
-                            ? Math.round((value / totalTestimoni) * 100)
-                            : 0;
-                          return `${label}: ${value} (${percentage}%)`;
-                        },
-                      },
-                    },
-                    datalabels: { display: false },
-                  },
-                }}
-              />
-            </div>
+                  datalabels: { display: false },
+                },
+              }}
+            />
           </div>
         </div>
       </div>
 
+      {/* BARANG KELUAR PER KATEGORI */}
+      <div className="space-y-6">
+        {Object.entries(stats.kategoriData).map(([kategori, data]) => (
+          <div key={kategori} className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
+            <h2 className="text-md font-semibold italic text-red-700 mb-3">Barang Keluar: {kategori}</h2>
+            <div className="h-64">
+              <Bar
+                data={{
+                  labels: bulanLabels,
+                  datasets: [
+                    {
+                      label: `Jumlah Barang Keluar (${kategori})`,
+                      data: data,
+                      backgroundColor: 'rgba(220, 38, 38, 0.6)',
+                      borderColor: '#dc2626',
+                      borderWidth: 1,
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { display: false }, datalabels: { display: true } },
+                  scales: {
+                    x: { ticks: { color: '#9ca3af', font: { size: 10 } } },
+                    y: { ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true, grid: { color: '#1f2937' } },
+                  },
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        body {
-          background-color: #000;
-        }
-        .font-jakarta {
-          font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        body { background-color: #000; }
+        .font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
       `}</style>
     </div>
   );
@@ -299,9 +330,7 @@ export default function AnalyticsPage() {
 function StatBox({ label, value }: { label: string; value: number }) {
   return (
     <div className="bg-red-700 p-3 rounded-lg border border-red-700 hover:border-red-600/50 transition-all group">
-      <h3 className="text-xs text-white/80 font-medium mb-1 group-hover:text-gray-300 transition-colors">
-        {label}
-      </h3>
+      <h3 className="text-xs text-white/80 font-medium mb-1 group-hover:text-gray-300 transition-colors">{label}</h3>
       <p className="text-xl font-bold text-red-300">{value}</p>
       <div className="mt-1 h-0.5 w-6 bg-red-600/50 rounded-full group-hover:w-8 transition-all duration-300" />
     </div>

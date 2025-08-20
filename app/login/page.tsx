@@ -23,7 +23,6 @@ export default function LoginPage() {
       return
     }
 
-    // Cek kecocokan username & password
     const { data: member, error: loginError } = await supabase
       .from('members')
       .select('id,nama')
@@ -36,17 +35,15 @@ export default function LoginPage() {
       return
     }
 
-    // Simpan info member ke localStorage
     localStorage.setItem('member_id', member.id)
     localStorage.setItem('member_nama', member.nama)
 
-    // Arahkan ke halaman khusus member
     router.push('/memberonly')
   }
 
   return (
     <main className="min-h-screen w-full bg-black flex items-center justify-center px-4 font-body relative">
-      <div className="max-w-md w-full space-y-6 bg-black/20">
+      <div className="max-w-md w-full space-y-6 bg-black/20 p-6 rounded-lg">
         <h1
           className="text-2xl font-display italic font-extrabold text-white tracking-wide text-center"
           style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
@@ -64,19 +61,22 @@ export default function LoginPage() {
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
+            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400"
+            className="w-full px-4 py-2 rounded-lg border border-neutral-300 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
           />
 
           <button
             type="submit"
-            className="w-full py-2 rounded-lg bg-red-600 hover:bg-white hover:text-red-600 text-white font-semibold transition"
+            className={`w-full py-2 rounded-lg bg-red-600 text-white font-semibold transition-colors
+                       hover:bg-red-500 hover:text-white
+                       focus:bg-red-500 focus:ring-2 focus:ring-red-400
+                       active:bg-red-700 active:text-white`}
           >
             Login
           </button>
@@ -99,7 +99,10 @@ export default function LoginPage() {
             <div className="border-t border-red-500">
               <button
                 onClick={() => setError('')}
-                className="w-full py-3 font-medium hover:rounded-lg hover:bg-red-700 transition-colors"
+                className={`w-full py-3 font-medium transition-colors
+                           hover:bg-red-700
+                           focus:bg-red-700 focus:ring-2 focus:ring-red-400
+                           active:bg-red-800 rounded-lg`}
               >
                 OK
               </button>
