@@ -4,14 +4,14 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import 'bootstrap-icons/font/bootstrap-icons.css'; // pastiin udah diinstall npm i bootstrap-icons
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Icon wrapper
+
 function SidebarIcon({ iconClass }: { iconClass: string }) {
   return <i className={`bi ${iconClass} w-4 h-4 mr-3 flex-shrink-0 text-white/60`}></i>;
 }
@@ -46,27 +46,31 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <nav className="p-2 rounded-lg space-x-0">
                 <Link href="/admin/add-member" className={linkClass}>
                   <SidebarIcon iconClass="bi-person-plus" />
-                  Tambah Member
-                </Link>
-                <Link href="/admin/listbarang" className={linkClass}>
-                  <SidebarIcon iconClass="bi-box-seam" />
-                  Stok Barang
+                  Membership
                 </Link>
                 <Link href="/admin/members" className={linkClass}>
                   <SidebarIcon iconClass="bi-people" />
-                  List Member
+                  Tabel Member
                 </Link>
                 <Link href="/admin/booking" className={linkClass}>
                   <SidebarIcon iconClass="bi-calendar-check" />
                   Jadwal Trainer
                 </Link>
-                <Link href="/admin/statistik" className={linkClass}>
-                  <SidebarIcon iconClass="bi-graph-up" />
-                  Statistik
+                <Link href="/admin/listbarang" className={linkClass}>
+                  <SidebarIcon iconClass="bi-box-seam" />
+                  Tabel Barang
+                </Link>
+                <Link href="/admin/historystok" className={linkClass}>
+                  <SidebarIcon iconClass="bi bi-journals" />
+                  In-Out Barang
                 </Link>
                 <Link href="/admin/testimoni" className={linkClass}>
                   <SidebarIcon iconClass="bi-chat-left-quote" />
                   Testimoni
+                </Link>
+                <Link href="/admin/statistik" className={linkClass}>
+                  <SidebarIcon iconClass="bi-graph-up" />
+                  Statistik
                 </Link>
                 <Link href="/admin/notes" className={linkClass}>
                   <SidebarIcon iconClass="bi-journal-text" />

@@ -40,6 +40,7 @@ interface Barang {
   id: string;
   nama: string;
   kategori: string;
+  stok: number;
 }
 
 export default function AnalyticsPage() {
@@ -50,7 +51,8 @@ export default function AnalyticsPage() {
     testimoniBulanIni: 0,
     pertumbuhanBulanan: [] as number[],
     ratingCounts: [0, 0, 0, 0, 0],
-    kategoriData: {} as Record<string, number[]>, // key: kategori, value: array jumlah barang keluar per bulan
+    kategoriData: {} as Record<string, number[]>,
+    stockCategoryData: {} as Record<string, number>,
   });
 
   const bulanLabels = Array.from({ length: 12 }, (_, i) =>
@@ -64,7 +66,7 @@ export default function AnalyticsPage() {
       const startOfMonth = today.startOf('month').toISOString();
       const sevenDaysLater = today.add(7, 'day').toISOString();
 
-      // --- MEMBER DATA ---
+      
       const { data: allMembers } = await supabase.from('members').select('*');
       const aktif = (allMembers ?? []).filter((m) =>
         m.tgl_berakhir ? dayjs(m.tgl_berakhir).isAfter(today) : false
@@ -77,7 +79,7 @@ export default function AnalyticsPage() {
           dayjs(m.tgl_berakhir).isBefore(sevenDaysLater)
       ).length;
 
-      // --- TESTIMONI DATA ---
+      
       const { count: testimoniBulanIni } = await supabase
         .from('testimonials')
         .select('*', { count: 'exact', head: true })
@@ -95,17 +97,11 @@ export default function AnalyticsPage() {
         }
       });
 
-      // --- PERTUMBUHAN MEMBER BULANAN ---
+      
       const pertumbuhanBulanan = await Promise.all(
         bulanLabels.map(async (_, i) => {
-          const start = dayjs()
-            .subtract(11 - i, 'month')
-            .startOf('month')
-            .toISOString();
-          const end = dayjs()
-            .subtract(11 - i, 'month')
-            .endOf('month')
-            .toISOString();
+          const start = dayjs().subtract(11 - i, 'month').startOf('month').toISOString();
+          const end = dayjs().subtract(11 - i, 'month').endOf('month').toISOString();
           const { count } = await supabase
             .from('members')
             .select('*', { count: 'exact', head: true })
@@ -115,11 +111,9 @@ export default function AnalyticsPage() {
         })
       );
 
-      // --- BARANG & BARANG KELUAR ---
-      const { data: allBarang } = await supabase.from('barang').select('id,kategori');
-      const { data: allBarangKeluar } = await supabase
-        .from('barang_keluar')
-        .select('*'); // pastikan ada kolom: barang_id, jumlah, tanggal_keluar
+      
+      const { data: allBarang } = await supabase.from('barang').select('id,kategori,stok');
+      const { data: allBarangKeluar } = await supabase.from('barang_keluar').select('*');
 
       const kategoriData: Record<string, number[]> = {};
       (allBarang ?? []).forEach((b) => {
@@ -129,13 +123,18 @@ export default function AnalyticsPage() {
       (allBarangKeluar ?? []).forEach((bk: BarangKeluar) => {
         const barang = allBarang?.find((b) => b.id === bk.barang_id);
         if (!barang) return;
-        const bulanIndex = bulanLabels.findIndex((label, i) => {
+        const bulanIndex = bulanLabels.findIndex((_, i) => {
           const bulan = dayjs().subtract(11 - i, 'month');
           return dayjs(bk.tanggal).isSame(bulan, 'month');
         });
         if (bulanIndex >= 0) {
           kategoriData[barang.kategori][bulanIndex] += bk.jumlah;
         }
+      });
+
+      const stockCategoryData: Record<string, number> = {};
+      (allBarang ?? []).forEach((b) => {
+        stockCategoryData[b.kategori] = (stockCategoryData[b.kategori] || 0) + (b.stok ?? 0);
       });
 
       setStats({
@@ -146,6 +145,7 @@ export default function AnalyticsPage() {
         pertumbuhanBulanan,
         ratingCounts,
         kategoriData,
+        stockCategoryData,
       });
     };
 
@@ -172,6 +172,27 @@ export default function AnalyticsPage() {
       {
         data: stats.ratingCounts,
         backgroundColor: ['#ff0000', '#ff4000', '#ff6600', '#ff9900', '#ffd500'],
+        borderWidth: 0,
+      },
+    ],
+  };
+
+  const backgroundColors = [
+    '#dc2626', '#f97316', '#eab308', '#16a34a', '#2563eb', '#8b5cf6', '#ec4899', '#0f172a',
+  ];
+
+  const datasets = Object.entries(stats.kategoriData).map(([kategori, data], idx) => ({
+    label: kategori,
+    data,
+    backgroundColor: backgroundColors[idx % backgroundColors.length],
+  }));
+
+  const stockCategoryChartData = {
+    labels: Object.keys(stats.stockCategoryData),
+    datasets: [
+      {
+        data: Object.values(stats.stockCategoryData),
+        backgroundColor: backgroundColors.slice(0, Object.keys(stats.stockCategoryData).length),
         borderWidth: 0,
       },
     ],
@@ -227,8 +248,9 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* MEMBER & TESTIMONI PIE */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      {/* PIES */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {/* Status Member */}
         <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
           <h2 className="text-sm italic font-semibold text-red-700 mb-2">Persentase Status Member</h2>
           <div className="h-48">
@@ -256,6 +278,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
+        {/* Rating Testimoni */}
         <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
           <h2 className="text-sm italic font-semibold text-red-700 mb-2">Persentase Rating Testimoni</h2>
           <div className="h-48">
@@ -282,40 +305,72 @@ export default function AnalyticsPage() {
             />
           </div>
         </div>
+
+        {/* Stock per Kategori */}
+        <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
+          <h2 className="text-sm italic font-semibold text-red-700 mb-2">Persentase Stok Barang per Kategori</h2>
+          <div className="h-48">
+            <Pie
+              data={stockCategoryChartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'right', labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } } },
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => {
+                        const label = context.label || '';
+                        const value = Number(context.raw) || 0;
+                        const total = Object.values(stats.stockCategoryData).reduce((a, b) => a + b, 0);
+                        const percentage = total ? Math.round((value / total) * 100) : 0;
+                        return `${label}: ${value} (${percentage}%)`;
+                      },
+                    },
+                  },
+                  datalabels: { display: false },
+                },
+              }}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* BARANG KELUAR PER KATEGORI */}
-      <div className="space-y-6">
-        {Object.entries(stats.kategoriData).map(([kategori, data]) => (
-          <div key={kategori} className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-            <h2 className="text-md font-semibold italic text-red-700 mb-3">Barang Keluar: {kategori}</h2>
-            <div className="h-64">
-              <Bar
-                data={{
-                  labels: bulanLabels,
-                  datasets: [
-                    {
-                      label: `Jumlah Barang Keluar (${kategori})`,
-                      data: data,
-                      backgroundColor: 'rgba(220, 38, 38, 0.6)',
-                      borderColor: '#dc2626',
-                      borderWidth: 1,
+      {/* BARANG KELUAR */}
+      <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
+        <h2 className="text-md font-semibold italic text-red-700 mb-3">Barang Keluar Per Kategori</h2>
+        <div className="h-80">
+          <Bar
+            data={{
+              labels: bulanLabels,
+              datasets: datasets,
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (context) => {
+                      const label = context.dataset.label || '';
+                      const value = Number(context.raw) || 0;
+                      return `${label}: ${value}`;
                     },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { display: false }, datalabels: { display: true } },
-                  scales: {
-                    x: { ticks: { color: '#9ca3af', font: { size: 10 } } },
-                    y: { ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true, grid: { color: '#1f2937' } },
                   },
-                }}
-              />
-            </div>
-          </div>
-        ))}
+                },
+                datalabels: { display: true, color: '#fff' },
+              },
+              scales: {
+                x: { ticks: { color: '#9ca3af', font: { size: 10 } } },
+                y: { ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true, grid: { color: '#1f2937' } },
+              },
+            }}
+          />
+        </div>
       </div>
 
       <style jsx global>{`
