@@ -12,16 +12,6 @@ interface HistoryItem {
   created_at: string;
 }
 
-interface SupabaseBarangRow {
-  id: string;
-  jumlah: number;
-  created_at: string;
-  barang: {
-    nama: string;
-    kategori: string;
-  };
-}
-
 export default function HistoryBarang() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,46 +33,39 @@ export default function HistoryBarang() {
       .select('id,jumlah,created_at,barang(nama,kategori)')
       .order('created_at', { ascending: false });
 
-    const merged: HistoryItem[] = [];
-
-    if (masukData) {
-      (masukData as any[]).forEach((m) => {
-        merged.push({
+    if (masukData && keluarData) {
+      const merged: HistoryItem[] = [
+        ...(masukData as any[]).map((m) => ({
           id: m.id,
-          nama: m.barang.nama,
-          kategori: m.barang.kategori,
-          jumlah: m.jumlah,
-          tipe: 'MASUK',
+          nama: m.barang?.nama ?? '',
+          kategori: m.barang?.kategori ?? '',
+          jumlah: Number(m.jumlah),
+          tipe: 'MASUK' as const,
           created_at: m.created_at,
-        });
-      });
-    }
-
-    if (keluarData) {
-      (keluarData as any[]).forEach((k) => {
-        merged.push({
+        })),
+        ...(keluarData as any[]).map((k) => ({
           id: k.id,
-          nama: k.barang.nama,
-          kategori: k.barang.kategori,
-          jumlah: k.jumlah,
-          tipe: 'KELUAR',
+          nama: k.barang?.nama ?? '',
+          kategori: k.barang?.kategori ?? '',
+          jumlah: Number(k.jumlah),
+          tipe: 'KELUAR' as const,
           created_at: k.created_at,
-        });
-      });
+        })),
+      ];
+
+      merged.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      setHistory(merged);
     }
 
-    merged.sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-
-    setHistory(merged);
     setLoading(false);
   };
 
   return (
     <div className="max-w-5xl mx-auto p-6 text-white font-[Plus Jakarta Sans]">
       <h2 className="text-3xl font-semibold mb-6 text-red-600">In-Out Barang</h2>
-
       {loading ? (
         <p>Loading...</p>
       ) : history.length === 0 ? (
