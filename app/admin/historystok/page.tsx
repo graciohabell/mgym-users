@@ -16,6 +16,15 @@ interface HistoryItem {
   } | null;
 }
 
+interface SupabaseHistoryItem {
+  id: string;
+  barang_id: string;
+  jumlah: number;
+  tipe: 'masuk' | 'keluar';
+  created_at: string;
+  barang?: { nama: string; kategori: string }[] | null;
+}
+
 export default function HistoryBarang() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,15 +40,18 @@ export default function HistoryBarang() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('history_stok')
-        .select('id, barang_id, jumlah, tipe, created_at, barang(nama, kategori)')
+  .from<'history_stok', SupabaseHistoryItem>('history_stok')
+  .select('id, barang_id, jumlah, tipe, created_at, barang(nama, kategori)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      
-      const normalizedData = (data || []).map((item: any) => ({
-        ...item,
+      const normalizedData: HistoryItem[] = (data || []).map(item => ({
+        id: item.id,
+        barang_id: item.barang_id,
+        jumlah: item.jumlah,
+        tipe: item.tipe,
+        created_at: item.created_at,
         barang: item.barang?.[0] || null
       }));
 
@@ -75,7 +87,6 @@ export default function HistoryBarang() {
         HISTORY BARANG MASUK & KELUAR
       </h2>
 
-
       {loading ? (
         <div className="flex justify-center items-center h-64">Loading...</div>
       ) : filteredHistory.length === 0 ? (
@@ -96,38 +107,37 @@ export default function HistoryBarang() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10 bg-black">
-  {filteredHistory.map(item => {
-    const { date, time } = formatDateTime(item.created_at);
-    return (
-      <tr
-        key={item.id}
-        tabIndex={0} // Supaya bisa focus saat di-tap
-        className="hover:bg-white/10 focus:bg-white/10 active:bg-white/10 transition-colors duration-200 outline-none"
-      >
-        <td className="px-4 py-3 text-gray-300 text-sm">{date}</td>
-        <td className="px-4 py-3 text-gray-300 text-sm">{time}</td>
-        <td className="px-4 py-3 text-gray-300 text-sm">{item.barang?.nama || 'Unknown'}</td>
-        <td className="px-4 py-3 text-gray-400 text-sm">{item.barang?.kategori || 'Unknown'}</td>
-        <td className="px-4 py-3 text-gray-400 text-sm">{item.jumlah}</td>
-        <td className="px-4 py-3">
-          <span
-            className={`px-2 py-1 rounded text-xs flex items-center gap-1 w-24 justify-center ${
-              item.tipe === 'masuk' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-            }`}
-          >
-            {item.tipe === 'masuk' ? (
-              <i className="bi bi-box-arrow-in-down"></i>
-            ) : (
-              <i className="bi bi-box-arrow-up"></i>
-            )}
-            {item.tipe.toUpperCase()}
-          </span>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-
+              {filteredHistory.map(item => {
+                const { date, time } = formatDateTime(item.created_at);
+                return (
+                  <tr
+                    key={item.id}
+                    tabIndex={0}
+                    className="hover:bg-white/10 focus:bg-white/10 active:bg-white/10 transition-colors duration-200 outline-none"
+                  >
+                    <td className="px-4 py-3 text-gray-300 text-sm">{date}</td>
+                    <td className="px-4 py-3 text-gray-300 text-sm">{time}</td>
+                    <td className="px-4 py-3 text-gray-300 text-sm">{item.barang?.nama || 'Unknown'}</td>
+                    <td className="px-4 py-3 text-gray-400 text-sm">{item.barang?.kategori || 'Unknown'}</td>
+                    <td className="px-4 py-3 text-gray-400 text-sm">{item.jumlah}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-2 py-1 rounded text-xs flex items-center gap-1 w-24 justify-center ${
+                          item.tipe === 'masuk' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                        }`}
+                      >
+                        {item.tipe === 'masuk' ? (
+                          <i className="bi bi-box-arrow-in-down"></i>
+                        ) : (
+                          <i className="bi bi-box-arrow-up"></i>
+                        )}
+                        {item.tipe.toUpperCase()}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
         </div>
       )}
