@@ -19,7 +19,7 @@ export default function MembersList() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-  // Untuk edit
+  
   const [editMember, setEditMember] = useState<Member | null>(null);
   const [editForm, setEditForm] = useState({
     nama: '',
@@ -75,7 +75,7 @@ export default function MembersList() {
     e.preventDefault();
     setEditError('');
 
-    // Validasi sederhana
+    
     if (
       !editForm.nama.trim() ||
       !editForm.email.trim() ||
@@ -125,7 +125,7 @@ export default function MembersList() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 font-sans bg-black/50 min-h-screen">
-      <h2 className="text-3xl font-semibold italic mb-8 font-[Plus Jakarta Sans] bg-red-700 text-transparent bg-clip-text">
+      <h2 className="text-3xl font-semibold italic mb-8 font-[Plus Jakarta Sans]  text-white bg-clip-text">
         TABEL DAFTAR MEMBERSHIP
       </h2>
 

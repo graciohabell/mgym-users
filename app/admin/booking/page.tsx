@@ -105,7 +105,7 @@ export default function BookingList() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 font-sans bg-black/50 min-h-screen">
-      <h2 className="text-3xl font-semibold italic mb-8 font-[Plus Jakarta Sans] bg-red-700 text-transparent bg-clip-text">
+      <h2 className="text-3xl font-semibold italic mb-8 font-[Plus Jakarta Sans] bg-red-700 text-white bg-clip-text">
         TABEL BOOKING MEMBER
       </h2>
 

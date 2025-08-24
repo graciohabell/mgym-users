@@ -178,6 +178,11 @@ export default function MemberOnlyPage() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('member_id');
+    router.push('/');
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center text-gray-600 font-body">
@@ -325,6 +330,24 @@ export default function MemberOnlyPage() {
           </form>
         </div>
       </motion.div>
+
+      {/* Tombol Logout di Paling Bawah */}
+      <motion.div 
+        className="w-full max-w-md mx-auto mt-12 mb-8 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <button
+          onClick={handleLogout}
+          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md
+                     hover:bg-red-600 hover:text-white
+                     focus:outline-none focus:ring-2 focus:ring-red-400
+                     transition-colors duration-300"
+        >
+          Logout
+        </button>
+      </motion.div>
     </main>
   );
-}
+} 

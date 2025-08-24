@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
@@ -11,7 +11,6 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-
 function SidebarIcon({ iconClass }: { iconClass: string }) {
   return <i className={`bi ${iconClass} w-4 h-4 mr-3 flex-shrink-0 text-white/60`}></i>;
 }
@@ -19,6 +18,26 @@ function SidebarIcon({ iconClass }: { iconClass: string }) {
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const sidebar = document.querySelector('aside');
+      const overlay = document.querySelector('.sidebar-overlay');
+      
+      if (isOpen && sidebar && !sidebar.contains(event.target as Node) && 
+          overlay && overlay.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
   const handleLogout = () => {
     router.push('/');
@@ -31,63 +50,75 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       <AnimatePresence>
         {isOpen && (
-          <motion.aside
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ duration: 0.4 }}
-            className="fixed top-0 left-0 h-full w-48 bg-black shadow-xl z-50 border-2 border-white/10 flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex justify-between items-center p-4 border-1 border-white/10">
-                <h2 className="text-red-600 font-[Plus Jakarta Sans]">.</h2>
+          <>
+            
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/50 z-40 sidebar-overlay"
+              onClick={onClose}
+            />
+            
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ duration: 0.4 }}
+              className="fixed top-0 left-0 h-full w-48 bg-black shadow-xl z-50 border-2 border-white/10 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex justify-between items-center p-4 border-1 border-white/10">
+                  <h2 className="text-red-600 font-[Plus Jakarta Sans]">.</h2>
+                </div>
+
+                <nav className="p-2 rounded-lg space-x-0">
+                  <Link href="/admin/add-member" className={linkClass} onClick={onClose}>
+                    <SidebarIcon iconClass="bi-person-plus" />
+                    Membership
+                  </Link>
+                  <Link href="/admin/members" className={linkClass} onClick={onClose}>
+                    <SidebarIcon iconClass="bi-people" />
+                    Tabel Member
+                  </Link>
+                  <Link href="/admin/booking" className={linkClass} onClick={onClose}>
+                    <SidebarIcon iconClass="bi-calendar-check" />
+                    Jadwal Trainer
+                  </Link>
+                  <Link href="/admin/listbarang" className={linkClass} onClick={onClose}>
+                    <SidebarIcon iconClass="bi-box-seam" />
+                    Tabel Barang
+                  </Link>
+                  <Link href="/admin/historystok" className={linkClass} onClick={onClose}>
+                    <SidebarIcon iconClass="bi bi-journals" />
+                    In-Out Barang
+                  </Link>
+                  <Link href="/admin/testimoni" className={linkClass} onClick={onClose}>
+                    <SidebarIcon iconClass="bi-chat-left-quote" />
+                    Testimoni
+                  </Link>
+                  <Link href="/admin/statistik" className={linkClass} onClick={onClose}>
+                    <SidebarIcon iconClass="bi-graph-up" />
+                    Statistik
+                  </Link>
+                  <Link href="/admin/notes" className={linkClass} onClick={onClose}>
+                    <SidebarIcon iconClass="bi-journal-text" />
+                    Catatan
+                  </Link>
+                </nav>
               </div>
 
-              <nav className="p-2 rounded-lg space-x-0">
-                <Link href="/admin/add-member" className={linkClass}>
-                  <SidebarIcon iconClass="bi-person-plus" />
-                  Membership
-                </Link>
-                <Link href="/admin/members" className={linkClass}>
-                  <SidebarIcon iconClass="bi-people" />
-                  Tabel Member
-                </Link>
-                <Link href="/admin/booking" className={linkClass}>
-                  <SidebarIcon iconClass="bi-calendar-check" />
-                  Jadwal Trainer
-                </Link>
-                <Link href="/admin/listbarang" className={linkClass}>
-                  <SidebarIcon iconClass="bi-box-seam" />
-                  Tabel Barang
-                </Link>
-                <Link href="/admin/historystok" className={linkClass}>
-                  <SidebarIcon iconClass="bi bi-journals" />
-                  In-Out Barang
-                </Link>
-                <Link href="/admin/testimoni" className={linkClass}>
-                  <SidebarIcon iconClass="bi-chat-left-quote" />
-                  Testimoni
-                </Link>
-                <Link href="/admin/statistik" className={linkClass}>
-                  <SidebarIcon iconClass="bi-graph-up" />
-                  Statistik
-                </Link>
-                <Link href="/admin/notes" className={linkClass}>
-                  <SidebarIcon iconClass="bi-journal-text" />
-                  Catatan
-                </Link>
-              </nav>
-            </div>
-
-            <div className="p-2 border-t border-white/10">
-              <button
-                onClick={() => setShowConfirm(true)}
-                className="block w-full text-center text-white/40 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white active:bg-white/20 active:text-white font-medium px-3 py-2 rounded-sm transition-colors font-[Plus Jakarta Sans]"
-              >
-                Logout
-              </button>
-            </div>
-          </motion.aside>
+              <div className="p-2 border-t border-white/10">
+                <button
+                  onClick={() => setShowConfirm(true)}
+                  className="block w-full text-center text-white/40 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white active:bg-white/20 active:text-white font-medium px-3 py-2 rounded-sm transition-colors font-[Plus Jakarta Sans]"
+                >
+                  Logout
+                </button>
+              </div>
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
 

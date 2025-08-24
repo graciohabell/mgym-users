@@ -66,7 +66,6 @@ export default function AnalyticsPage() {
       const startOfMonth = today.startOf('month').toISOString();
       const sevenDaysLater = today.add(7, 'day').toISOString();
 
-      
       const { data: allMembers } = await supabase.from('members').select('*');
       const aktif = (allMembers ?? []).filter((m) =>
         m.tgl_berakhir ? dayjs(m.tgl_berakhir).isAfter(today) : false
@@ -79,7 +78,6 @@ export default function AnalyticsPage() {
           dayjs(m.tgl_berakhir).isBefore(sevenDaysLater)
       ).length;
 
-      
       const { count: testimoniBulanIni } = await supabase
         .from('testimonials')
         .select('*', { count: 'exact', head: true })
@@ -97,7 +95,6 @@ export default function AnalyticsPage() {
         }
       });
 
-      
       const pertumbuhanBulanan = await Promise.all(
         bulanLabels.map(async (_, i) => {
           const start = dayjs().subtract(11 - i, 'month').startOf('month').toISOString();
@@ -111,30 +108,31 @@ export default function AnalyticsPage() {
         })
       );
 
-      
-      const { data: allBarang } = await supabase.from('barang').select('id,kategori,stok');
-      const { data: allBarangKeluar } = await supabase.from('barang_keluar').select('*');
+      const { data: allBarang } = await supabase.from('barang').select('id,nama,kategori,stok');
+      const { data: historyStok } = await supabase.from('history_stok').select('id,barang_id,jumlah,tipe,created_at');
 
       const kategoriData: Record<string, number[]> = {};
+      const stockCategoryData: Record<string, number> = {};
       (allBarang ?? []).forEach((b) => {
         kategoriData[b.kategori] = Array(12).fill(0);
+        stockCategoryData[b.kategori] = 0;
       });
 
-      (allBarangKeluar ?? []).forEach((bk: BarangKeluar) => {
-        const barang = allBarang?.find((b) => b.id === bk.barang_id);
+      (allBarang ?? []).forEach((b) => {
+        stockCategoryData[b.kategori] = b.stok ?? 0;
+      });
+
+      (historyStok ?? []).forEach((hs) => {
+        if (hs.tipe !== 'keluar') return;
+        const barang = allBarang?.find((b) => b.id === hs.barang_id);
         if (!barang) return;
         const bulanIndex = bulanLabels.findIndex((_, i) => {
           const bulan = dayjs().subtract(11 - i, 'month');
-          return dayjs(bk.tanggal).isSame(bulan, 'month');
+          return dayjs(hs.created_at).isSame(bulan, 'month');
         });
         if (bulanIndex >= 0) {
-          kategoriData[barang.kategori][bulanIndex] += bk.jumlah;
+          kategoriData[barang.kategori][bulanIndex] += hs.jumlah;
         }
-      });
-
-      const stockCategoryData: Record<string, number> = {};
-      (allBarang ?? []).forEach((b) => {
-        stockCategoryData[b.kategori] = (stockCategoryData[b.kategori] || 0) + (b.stok ?? 0);
       });
 
       setStats({
@@ -200,194 +198,73 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-black p-6 font-jakarta">
-      <h1 className="text-2xl md:text-3xl italic font-semibold text-red-700 mb-6 tracking-tight">
+      <h1 className="text-2xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mr-2" viewBox="0 0 20 20" fill="currentColor"></svg>
         DASHBOARD STATISTIK M.GYM
       </h1>
 
-      {/* STATISTIK MEMBER */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatBox label="Total Data Member Aktif" value={stats.aktif} />
-        <StatBox label="Total Data Member Non-Aktif" value={stats.nonAktif} />
-        <StatBox label="Total Data Akan Non-Aktif dalam 7 Hari" value={stats.expSoon} />
-        <StatBox label="Total Testimoni" value={stats.testimoniBulanIni} />
+        <StatBox label="Total Data Member Aktif" value={stats.aktif} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>} />
+        <StatBox label="Total Data Member Non-Aktif" value={stats.nonAktif} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /><path d="M4 12a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z" /></svg>} />
+        <StatBox label="Total Data Akan Non-Aktif dalam 7 Hari" value={stats.expSoon} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" /></svg>} />
+        <StatBox label="Total Testimoni" value={stats.testimoniBulanIni} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20 " fill="currentColor"><path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H6z" clipRule="evenodd" /></svg>} />
       </div>
 
-      {/* PERTUMBUHAN MEMBER */}
       <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors mb-6">
-        <h2 className="text-md font-semibold italic text-red-700 mb-3">Pertumbuhan Member</h2>
+        <h2 className="text-md font-semibold italic text-red-700 mb-3 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" /></svg>
+          Pertumbuhan Member
+        </h2>
         <div className="h-64">
           <Line
-            data={{
-              labels: bulanLabels,
-              datasets: [
-                {
-                  label: 'Member Baru',
-                  data: stats.pertumbuhanBulanan,
-                  borderColor: '#dc2626',
-                  backgroundColor: 'rgba(220, 38, 38, 0.08)',
-                  borderWidth: 2,
-                  pointBackgroundColor: '#dc2626',
-                  pointBorderColor: '#fff',
-                  pointRadius: 4,
-                  pointHoverRadius: 6,
-                  tension: 0.3,
-                  fill: true,
-                },
-              ],
-            }}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10 } } },
-                y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true },
-              },
-            }}
+            data={{ labels: bulanLabels, datasets: [{ label: 'Member Baru', data: stats.pertumbuhanBulanan, borderColor: '#dc2626', backgroundColor: 'rgba(220, 38, 38, 0.08)', borderWidth: 2, pointBackgroundColor: '#dc2626', pointBorderColor: '#fff', pointRadius: 4, pointHoverRadius: 6, tension: 0.3, fill: true }] }}
+            options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10 } } }, y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true } } }}
           />
         </div>
       </div>
 
-      {/* PIES */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Status Member */}
         <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-          <h2 className="text-sm italic font-semibold text-red-700 mb-2">Persentase Status Member</h2>
+          <h2 className="text-sm italic font-semibold text-red-700 mb-2 flex items-center">Persentase Status Member</h2>
           <div className="h-48">
-            <Pie
-              data={memberComparisonData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: { position: 'right', labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } } },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => {
-                        const label = context.label || '';
-                        const value = Number(context.raw) || 0;
-                        const percentage = totalMembers ? Math.round((value / totalMembers) * 100) : 0;
-                        return `${label}: ${value} (${percentage}%)`;
-                      },
-                    },
-                  },
-                  datalabels: { display: false },
-                },
-              }}
-            />
+            <Pie data={memberComparisonData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } } }, tooltip: { callbacks: { label: (context) => { const label = context.label || ''; const value = Number(context.raw) || 0; const percentage = totalMembers ? Math.round((value / totalMembers) * 100) : 0; return `${label}: ${value} (${percentage}%)`; } } }, datalabels: { display: false } } }} />
           </div>
         </div>
 
-        {/* Rating Testimoni */}
         <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-          <h2 className="text-sm italic font-semibold text-red-700 mb-2">Persentase Rating Testimoni</h2>
+          <h2 className="text-sm italic font-semibold text-red-700 mb-2 flex items-center">Rating Testimoni</h2>
           <div className="h-48">
-            <Pie
-              data={ratingChartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: { position: 'right', labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } } },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => {
-                        const label = context.label || '';
-                        const value = Number(context.raw) || 0;
-                        const percentage = totalTestimoni ? Math.round((value / totalTestimoni) * 100) : 0;
-                        return `${label}: ${value} (${percentage}%)`;
-                      },
-                    },
-                  },
-                  datalabels: { display: false },
-                },
-              }}
-            />
+            <Pie data={ratingChartData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } } }, tooltip: { callbacks: { label: (context) => { const label = context.label || ''; const value = Number(context.raw) || 0; const percentage = totalTestimoni ? Math.round((value / totalTestimoni) * 100) : 0; return `${label}: ${value} (${percentage}%)`; } } }, datalabels: { display: false } } }} />
           </div>
         </div>
 
-        {/* Stock per Kategori */}
-        <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-          <h2 className="text-sm italic font-semibold text-red-700 mb-2">Persentase Stok Barang per Kategori</h2>
-          <div className="h-48">
-            <Pie
-              data={stockCategoryChartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: { position: 'right', labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } } },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => {
-                        const label = context.label || '';
-                        const value = Number(context.raw) || 0;
-                        const total = Object.values(stats.stockCategoryData).reduce((a, b) => a + b, 0);
-                        const percentage = total ? Math.round((value / total) * 100) : 0;
-                        return `${label}: ${value} (${percentage}%)`;
-                      },
-                    },
-                  },
-                  datalabels: { display: false },
-                },
-              }}
-            />
-          </div>
-        </div>
-      </div>
 
-      {/* BARANG KELUAR */}
       <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-        <h2 className="text-md font-semibold italic text-red-700 mb-3">Barang Keluar Per Kategori</h2>
-        <div className="h-80">
-          <Bar
-            data={{
-              labels: bulanLabels,
-              datasets: datasets,
-            }}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  position: 'bottom',
-                  labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } },
-                },
-                tooltip: {
-                  callbacks: {
-                    label: (context) => {
-                      const label = context.dataset.label || '';
-                      const value = Number(context.raw) || 0;
-                      return `${label}: ${value}`;
-                    },
-                  },
-                },
-                datalabels: { display: true, color: '#fff' },
-              },
-              scales: {
-                x: { ticks: { color: '#9ca3af', font: { size: 10 } } },
-                y: { ticks: { color: '#9ca3af', stepSize: 1 }, beginAtZero: true, grid: { color: '#1f2937' } },
-              },
-            }}
-          />
+        <h2 className="text-sm italic font-semibold text-red-700 mb-2 flex items-center">Stock per Kategori</h2>
+        <div className="h-48">
+          <Pie data={stockCategoryChartData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#f3f4f6', font: { family: "'Plus Jakarta Sans', sans-serif" } } }, datalabels: { display: false } } }} />
         </div>
       </div>
-
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        body { background-color: #000; }
-        .font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
-      `}</style>
     </div>
+
+    <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
+          <h2 className="text-sm italic font-semibold text-red-700 mb-2 flex items-center">Barang Keluar per Kategori</h2>
+          <div className="h-48">
+            <Bar data={{ labels: bulanLabels, datasets }} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#f3f4f6' } }, datalabels: { display: false } }, scales: { x: { ticks: { color: '#f3f4f6' } }, y: { ticks: { color: '#f3f4f6', stepSize: 1 }, beginAtZero: true } } }} />
+          </div>
+        </div>
+      </div>
   );
 }
 
-function StatBox({ label, value }: { label: string; value: number }) {
+function StatBox({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
   return (
-    <div className="bg-red-700 p-3 rounded-lg border border-red-700 hover:border-red-600/50 transition-all group">
-      <h3 className="text-xs text-white/80 font-medium mb-1 group-hover:text-gray-300 transition-colors">{label}</h3>
-      <p className="text-xl font-bold text-red-300">{value}</p>
-      <div className="mt-1 h-0.5 w-6 bg-red-600/50 rounded-full group-hover:w-8 transition-all duration-300" />
+    <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors flex items-center justify-between">
+      <div>
+        <p className="text-xs text-red-600 uppercase mb-1">{label}</p>
+        <p className="text-lg font-bold text-white">{value}</p>
+      </div>
+      <div className="text-red-600">{icon}</div>
     </div>
   );
 }
