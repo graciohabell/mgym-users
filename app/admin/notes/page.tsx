@@ -68,7 +68,7 @@ export default function AdminNotes() {
 
   return (
     <div className="min-h-screen p-6 bg-black font-jakarta">
-      <h1 className="text-2xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight">
+      <h1 className="text-3xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight">
         DASHBOARD NOTES
       </h1>
 

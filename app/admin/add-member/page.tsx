@@ -108,7 +108,7 @@ export default function AddMemberPage() {
 
   return (
     <div className="min-h-screen bg-black p-6 font-jakarta">
-      <h2 className="text-2xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight text-center">
+      <h2 className="text-3xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight text-center">
         FORM MEMBERSHIP
       </h2>
 

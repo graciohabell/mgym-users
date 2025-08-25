@@ -84,7 +84,7 @@ export default function HistoryBarang() {
   return (
     <div className="max-w-6xl mx-auto p-6 font-sans bg-black/50 min-h-screen text-white">
       <h2 className="text-3xl font-semibold italic mb-8 font-[Plus Jakarta Sans] text-white bg-clip-text">
-        HISTORY BARANG MASUK & KELUAR
+        HISTORY IN & OUT BARANG 
       </h2>
 
       {loading ? (

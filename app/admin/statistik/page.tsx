@@ -198,7 +198,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-black p-6 font-jakarta">
-      <h1 className="text-2xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight flex items-center">
+      <h1 className="text-3xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mr-2" viewBox="0 0 20 20" fill="currentColor"></svg>
         DASHBOARD STATISTIK M.GYM
       </h1>
