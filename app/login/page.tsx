@@ -45,7 +45,7 @@ export default function LoginPage() {
     <main className="min-h-screen w-full bg-black flex flex-col items-center justify-center px-4 py-8 font-body">
       <div className="w-full max-w-md bg-black/20 p-6 rounded-2xl shadow-lg space-y-6">
         <h1
-          className="text-2xl md:text-3xl font-display italic font-extrabold text-white tracking-wide text-center"
+          className="text-2xl font-display italic font-semibold text-white tracking-wide text-center"
         >
           LOGIN M.GYM MEMBERSHIP
         </h1>
@@ -74,7 +74,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-sm md:text-base text-neutral-500 text-center leading-relaxed">
+        <p className="text-sm md:text-base text-white text-center leading-relaxed">
           Login dengan username dan password yang telah kamu buat.
         </p>
       </div>

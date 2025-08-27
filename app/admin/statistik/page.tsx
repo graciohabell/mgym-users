@@ -198,11 +198,11 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-black p-6 font-jakarta">
-      <h1 className="text-2xl font-semibold text-white mb-2 tracking-tight">
+      <h1 className="text-2xl font-semibold text-white mb-1 tracking-tight">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mr-2" viewBox="0 0 20 20" fill="currentColor"></svg>
         DASHBOARD STATISTIK M.GYM
       </h1>
-      <p className="text-sm mb-5 font-[Plus Jakarta Sans] italic text-white bg-clip-text">
+      <p className="text-sm mb-6 font-[Plus Jakarta Sans] italic text-white bg-clip-text">
         Halaman dashboard statistik database M.GYM.
       </p>
 
@@ -225,6 +225,13 @@ export default function AnalyticsPage() {
           />
         </div>
       </div>
+
+      <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
+          <h2 className="text-sm italic font-semibold text-red-700 mb-2 flex items-center">Barang Keluar per Kategori</h2>
+          <div className="h-48">
+            <Bar data={{ labels: bulanLabels, datasets }} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#f3f4f6' } }, datalabels: { display: false } }, scales: { x: { ticks: { color: '#f3f4f6' } }, y: { ticks: { color: '#f3f4f6', stepSize: 1 }, beginAtZero: true } } }} />
+          </div>
+        </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
@@ -250,24 +257,18 @@ export default function AnalyticsPage() {
       </div>
     </div>
 
-    <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors">
-          <h2 className="text-sm italic font-semibold text-red-700 mb-2 flex items-center">Barang Keluar per Kategori</h2>
-          <div className="h-48">
-            <Bar data={{ labels: bulanLabels, datasets }} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#f3f4f6' } }, datalabels: { display: false } }, scales: { x: { ticks: { color: '#f3f4f6' } }, y: { ticks: { color: '#f3f4f6', stepSize: 1 }, beginAtZero: true } } }} />
-          </div>
-        </div>
+    
       </div>
   );
 }
-
 function StatBox({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
   return (
-    <div className="bg-black p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors flex items-center justify-between">
+    <div className="bg-red-700 p-4 rounded-xl border border-red-600/20 hover:border-red-600/40 transition-colors flex items-center justify-between">
       <div>
-        <p className="text-xs text-red-600 uppercase mb-1">{label}</p>
+        <p className="text-xs text-white uppercase mb-1">{label}</p>
         <p className="text-lg font-bold text-white">{value}</p>
       </div>
-      <div className="text-red-600">{icon}</div>
+      <div className="text-white">{icon}</div>
     </div>
   );
 }

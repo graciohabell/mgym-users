@@ -7,10 +7,10 @@ export default function MembershipPage() {
     <main className="min-h-screen w-full bg-black flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md bg-black/80 shadow-md p-6 sm:p-8 flex flex-col items-center text-center gap-6 sm:gap-8 rounded-2xl">
         <h1
-          className="text-xl sm:text-2xl font-display italic font-extrabold text-white tracking-wide"
+          className="text-xl sm:text-2xl font-display italic font-semibold text-white tracking-wide"
           style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
         >
-          M.GYM MEMBER REMINDER
+          M.GYM MEMBERSHIP
         </h1>
 
         {/* Buttons */}
@@ -45,11 +45,11 @@ export default function MembershipPage() {
             className="text-red-600 italic font-semibold"
             style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
           >
-            M.GYM Member Reminder
+           Halaman M.GYM Membership 
           </span>{' '}
           adalah halaman eksklusif untuk para member M.GYM.
           <br />
-          Di sini kamu bisa cek status, masa aktif, dan notifikasi jatuh tempo membership kamu.
+          Di halaman ini member bisa cek status membership, request trainer dan memberikan testimoni kamu.
         </p>
       </div>
     </main>

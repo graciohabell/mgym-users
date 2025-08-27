@@ -77,11 +77,14 @@ export default function SignUpPage() {
     <main className="min-h-screen w-full bg-black flex items-center justify-center px-4 font-body relative">
       <div className="w-full max-w-md bg-black rounded-2xl p-8 shadow-sm space-y-6">
         <h1
-          className="text-2xl text-center italic font-extrabold text-white tracking-wide"
+          className="text-2xl text-center italic font-semibold text-white tracking-wide"
           style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
         >
           DAFTAR AKSES MEMBER REMINDER
         </h1>
+        <p className="text-sm md:text-base text-white text-center max-w-md font-body mt-2 leading-relaxed">
+          Sign-Up akses halaman M.GYM Membership hanya bisa dilakukan bagi member yang telah melakukan registrasi membership via offline on-site.
+        </p>
 
         <form
           onSubmit={handleSubmit}
@@ -125,8 +128,8 @@ export default function SignUpPage() {
           </button>
         </form>
 
-        <p className="text-sm md:text-base text-neutral-200 max-w-md font-body mt-2 leading-relaxed">
-          Tetap ingat username dan password yang saat ini kamu daftarkan/sign-up untuk login/mengakses Member Reminder.
+        <p className="text-sm md:text-base text-center text-neutral-200 max-w-md font-body mt-2 leading-relaxed">
+          Tetap ingat username dan password yang saat ini kamu daftarkan/sign-up untuk login/mengakses halaman M.GYM Membership sepanjang membership kamu.
         </p>
       </div>
 
