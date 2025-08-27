@@ -4,15 +4,24 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import '../../globals.css';
 
-interface BookingFromDB {
+interface BookingDB {
   id: string;
   member_id: string;
-  members: { nama: string }[];
-  trainer_list: { nama: string }[];
+  trainer_id: string;
   tanggal: string;
   jam: string;
   status: string;
   created_at: string;
+}
+
+interface Member {
+  id: string;
+  nama: string;
+}
+
+interface Trainer {
+  id: string;
+  nama: string;
 }
 
 interface Booking {
@@ -39,34 +48,42 @@ export default function BookingList() {
 
   const fetchBookings = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+
+    // 1️⃣ fetch semua bookings
+    const { data: bookingsData, error: bookingsError } = await supabase
       .from('bookings')
-      .select(`
-        id,
-        tanggal,
-        jam,
-        status,
-        created_at,
-        member_id,
-        members (nama),
-        trainer_id,
-        trainer_list (nama)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      const mapped = (data as BookingFromDB[]).map((b) => ({
-        id: b.id,
-        member_id: b.member_id,
-        member_nama: b.members?.[0]?.nama || '-',
-        trainer_nama: b.trainer_list?.[0]?.nama || '-',
-        tanggal: b.tanggal,
-        jam: b.jam,
-        status: b.status,
-        created_at: b.created_at
-      }));
-      setBookings(mapped);
+    if (bookingsError || !bookingsData) {
+      console.error(bookingsError);
+      setLoading(false);
+      return;
     }
+
+    // 2️⃣ fetch semua members
+    const { data: membersData } = await supabase
+      .from('members')
+      .select('id, nama');
+
+    // 3️⃣ fetch semua trainers
+    const { data: trainersData } = await supabase
+      .from('trainer_list')
+      .select('id, nama');
+
+    // 4️⃣ map booking + attach nama member & trainer
+    const mapped: Booking[] = (bookingsData as BookingDB[]).map((b) => ({
+      id: b.id,
+      member_id: b.member_id,
+      member_nama: membersData?.find(m => m.id === b.member_id)?.nama || '-',
+      trainer_nama: trainersData?.find(t => t.id === b.trainer_id)?.nama || '-',
+      tanggal: b.tanggal,
+      jam: b.jam,
+      status: b.status,
+      created_at: b.created_at
+    }));
+
+    setBookings(mapped);
     setLoading(false);
   };
 
@@ -201,7 +218,7 @@ export default function BookingList() {
             <div className="grid grid-cols-2 border-t rounded-2xl border-red-900/50">
               <button onClick={()=>setPopup(null)} className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors">Cancel</button>
               <button
-                onClick={()=>{
+                onClick={()=> {
                   if(popup.action==='approve') updateStatus(popup.id,'approved');
                   if(popup.action==='reject') updateStatus(popup.id,'rejected');
                   if(popup.action==='delete') deleteBooking(popup.id);
