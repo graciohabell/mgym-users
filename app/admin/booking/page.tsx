@@ -105,12 +105,12 @@ export default function BookingList() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 font-sans bg-black/50 min-h-screen">
-      <h2 className="text-3xl font-semibold italic mb-8 font-[Plus Jakarta Sans] bg-red-700 text-white bg-clip-text">
-        TABEL BOOKING MEMBER
+      <h2 className="text-2xl font-semibold mb-3 font-[Plus Jakarta Sans] bg-red-700 text-white bg-clip-text">
+        PERMINTAAN BOOKING TRAINER
       </h2>
 
-      <h3 className="text-sm mb-8 font-[Plus Jakarta Sans] text-white/15 bg-clip-text">
-        Rotasi layar kamu saat ini untuk pengalaman lebih baik.
+      <h3 className="text-sm mb-8 italic font-[Plus Jakarta Sans] text-white bg-clip-text">
+        Halaman aprrove dan decline request jadwal trainer dari member M.GYM.
       </h3>
 
       <input

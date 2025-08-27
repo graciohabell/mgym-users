@@ -83,9 +83,12 @@ export default function HistoryBarang() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 font-sans bg-black/50 min-h-screen text-white">
-      <h2 className="text-3xl font-semibold italic mb-8 font-[Plus Jakarta Sans] text-white bg-clip-text">
+      <h2 className="text-2xl font-semibold mb-2 font-[Plus Jakarta Sans] text-white bg-clip-text">
         HISTORY IN & OUT BARANG 
       </h2>
+      <p className="text-sm mb-5 font-[Plus Jakarta Sans] italic text-white bg-clip-text">
+        Halaman history stok barang masuk dan keluar M.GYM.
+      </p>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">Loading...</div>

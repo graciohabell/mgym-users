@@ -68,10 +68,12 @@ export default function AdminTestimonialsPage() {
       className="min-h-screen bg-black text-white p-6 font-sans"
       style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
     >
-      <h1 className="text-3xl font-semibold italic mb-6 text-white">
-        DATABASE TESTIMONI
+      <h1 className="text-2xl font-semibold mb-2 text-white">
+        TESTIMONI
       </h1>
-
+      <p className="text-sm mb-4 font-[Plus Jakarta Sans] italic text-white bg-clip-text">
+        Halaman database dan filter testimoni member M.GYM.
+      </p>
       {/* Filter Rating Bar */}
       <div className="bg-neutral-900 rounded-xl overflow-hidden w-full max-w-3xl mx-auto flex divide-x divide-neutral-800 shadow-md mb-8">
         <button

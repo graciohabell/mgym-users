@@ -108,9 +108,12 @@ export default function AddMemberPage() {
 
   return (
     <div className="min-h-screen bg-black p-6 font-jakarta">
-      <h2 className="text-3xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight text-center">
-        FORM MEMBERSHIP
+      <h2 className="text-2xl font-semibold text-white mb-1 ">
+        MEMBERSHIP
       </h2>
+      <p className="text-sm mb-3 font-[Plus Jakarta Sans] italic text-white bg-clip-text">
+        Halaman input data profil member baru M.GYM.
+      </p>
 
       <div className="max-w-md mx-auto bg-black p-6 rounded-xl shadow-lg">
         <form onSubmit={handleOpenModal} className="space-y-5">

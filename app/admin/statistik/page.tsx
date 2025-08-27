@@ -198,10 +198,13 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-black p-6 font-jakarta">
-      <h1 className="text-3xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight flex items-center">
+      <h1 className="text-2xl font-semibold text-white mb-2 tracking-tight">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mr-2" viewBox="0 0 20 20" fill="currentColor"></svg>
         DASHBOARD STATISTIK M.GYM
       </h1>
+      <p className="text-sm mb-5 font-[Plus Jakarta Sans] italic text-white bg-clip-text">
+        Halaman dashboard statistik database M.GYM.
+      </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatBox label="Total Data Member Aktif" value={stats.aktif} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>} />

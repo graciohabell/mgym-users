@@ -192,162 +192,98 @@ export default function MemberOnlyPage() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-white px-4 pt-28 font-semibold pb-20 text-black/70 font-body">
-      <motion.div className="w-full max-w-md mx-auto bg-white/70 border border-red-100 rounded-2xl p-8 shadow-md text-center backdrop-blur-sm">
-        <h1
-          className="text-2xl font-display italic font-extrabold text-red-600 tracking-wide mb-4"
-          style={{ fontFamily: 'Tomorrow, sans-serif', fontStyle: 'italic' }}
-        >
+    <main className="min-h-screen w-full bg-white px-4 sm:px-6 md:px-10 pt-24 font-semibold pb-20 text-black/70 font-body">
+      
+      {/* CARD INFO MEMBER */}
+      <motion.div className="w-full max-w-xl mx-auto bg-white/80 border border-red-100 rounded-2xl p-6 sm:p-8 shadow-md text-center backdrop-blur-sm">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-red-600 tracking-wide mb-4 italic">
           M.GYM
         </h1>
-        <p>Selamat Datang, {member?.nama} !</p>
-        <p>
-          Membership kamu aktif dari {member?.tgl_daftar} sampai {member?.tgl_berakhir}.
+        <p className="text-base sm:text-lg">Selamat Datang, {member?.nama} !</p>
+        <p className="text-sm sm:text-base">
+          Membership aktif dari <span className="font-semibold">{member?.tgl_daftar}</span> sampai <span className="font-semibold">{member?.tgl_berakhir}</span>.
         </p>
         {!expired && daysLeft !== null && (
-          <p
-            className={`mt-2 font-display font-semibold ${
-              daysLeft <= 7 ? 'text-red-700' : 'text-green-700'
-            }`}
-          >
+          <p className={`mt-2 font-bold ${daysLeft <= 7 ? 'text-red-700' : 'text-green-700'}`}>
             {daysLeft <= 7 ? `BERAKHIR DALAM ${daysLeft} HARI` : 'MASIH AKTIF'}
           </p>
         )}
-        {expired && (
-          <p className="text-red-700 font-semibold font-display">SUDAH JATUH TEMPO</p>
-        )}
+        {expired && <p className="text-red-700 font-bold">SUDAH JATUH TEMPO</p>}
       </motion.div>
 
-      <motion.div className="w-full max-w-md mx-auto mt-12 bg-white/70 border border-red-100 rounded-2xl p-6 shadow-md backdrop-blur-sm">
-        <h2 className="text-lg font-semibold mb-4 text-red-600">Booking Sesi Personal Trainer</h2>
+      {/* FORM BOOKING */}
+      <motion.div className="w-full max-w-xl mx-auto mt-10 bg-white/80 border border-red-100 rounded-2xl p-6 sm:p-8 shadow-md backdrop-blur-sm">
+        <h2 className="text-lg sm:text-xl font-bold mb-4 text-red-600">Booking Sesi Personal Trainer</h2>
         <form onSubmit={handleBookingSubmit} className="space-y-4">
-          <input
-            type="date"
-            value={tanggal}
-            onChange={(e) => setTanggal(e.target.value)}
-            className="w-full text-black/70 p-2 border border-black/50 rounded-md
-                       focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
-          />
-          <input
-            type="time"
-            value={jam}
-            onChange={(e) => setJam(e.target.value)}
-            className="w-full text-black/70 p-2 border border-black/50 rounded-md
-                       focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
-          />
-          <select
-            value={trainerId}
-            onChange={(e) => setTrainerId(e.target.value)}
-            className="w-full text-black/70 border border-black/50 p-2 rounded-md
-                       focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
-          >
+          <input type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)}
+            className="w-full p-3 text-sm sm:text-base border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400" />
+          <input type="time" value={jam} onChange={(e) => setJam(e.target.value)}
+            className="w-full p-3 text-sm sm:text-base border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400" />
+          <select value={trainerId} onChange={(e) => setTrainerId(e.target.value)}
+            className="w-full p-3 text-sm sm:text-base border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400">
             <option value="">Pilih Trainer</option>
-            {trainers.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.nama}
-              </option>
-            ))}
+            {trainers.map((t) => <option key={t.id} value={t.id}>{t.nama}</option>)}
           </select>
-          <button
-            type="submit"
-            className="w-full bg-red-600 text-white py-2 rounded-md
-                       hover:bg-white hover:text-red-600
-                       focus:bg-red-500 focus:ring-2 focus:ring-red-400
-                       active:bg-red-700 transition-colors"
-          >
+          <button type="submit"
+            className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-white hover:text-red-600 border border-red-600 transition">
             Booking
           </button>
-          {bookingMessage && <p className="text-sm text-center text-red-600">{bookingMessage}</p>}
+          {bookingMessage && <p className="text-center text-sm text-red-600">{bookingMessage}</p>}
         </form>
       </motion.div>
 
-      <motion.div className="w-full max-w-md mx-auto mt-8 bg-white/70 rounded-2xl p-6 shadow-md backdrop-blur-sm">
-        <h2 className="text-lg font-semibold mb-4 text-red-600">Jadwal Booking</h2>
+      {/* LIST BOOKING */}
+      <motion.div className="w-full max-w-xl mx-auto mt-8 bg-white/80 border border-red-100 rounded-2xl p-6 sm:p-8 shadow-md backdrop-blur-sm">
+        <h2 className="text-lg sm:text-xl font-bold mb-4 text-red-600">Jadwal Booking</h2>
         {bookings.length === 0 ? (
-          <p className="text-sm text-black/70">Belum ada booking.</p>
+          <p className="text-sm">Belum ada booking.</p>
         ) : (
           <ul className="space-y-3">
             {bookings.map((b) => (
-              <li key={b.id} className="p-3 bg-white text-black/70 text-sm shadow-sm">
-                <p>
-                  <strong>Tanggal :</strong> {b.tanggal}
-                </p>
-                <p>
-                  <strong>Jam :</strong> {b.jam}
-                </p>
-                <p>
-                  <strong>Trainer :</strong> {b.trainer.nama}
-                </p>
-                <p>
-                  <strong>Status :</strong> {b.status}
-                </p>
-                <p className="text-sm text-black/70">
-                  Hubungi admin jika jadwal belum di approved 1x24 jam !
-                </p>
+              <li key={b.id} className="p-3 bg-white rounded-lg shadow-sm text-sm">
+                <p><strong>Tanggal:</strong> {b.tanggal}</p>
+                <p><strong>Jam:</strong> {b.jam}</p>
+                <p><strong>Trainer:</strong> {b.trainer.nama}</p>
+                <p><strong>Status:</strong> {b.status}</p>
               </li>
             ))}
           </ul>
         )}
       </motion.div>
 
-      <motion.div className="w-full max-w-md mx-auto mt-12">
-        <div className="border-t pt-8">
-          <h2 className="text-sm font-semibold mb-4 text-black/70 text-center">TESTIMONI</h2>
-          <form onSubmit={handleSubmitTestimoni} className="text-sm space-y-4">
-            <textarea
-              value={testimoni}
-              onChange={(e) => setTestimoni(e.target.value)}
-              placeholder="Tulis sudut pandang kamu terhadap M.GYM..."
-              className="text-md w-full p-3 border border-gray-300 text-black rounded-md
-                         focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
-              rows={4}
-            />
-            <div>
-              <label className="block mb-1 font-medium">Rating:</label>
-              <select
-                value={rating}
-                onChange={(e) => setRating(Number(e.target.value))}
-                className="w-full p-2 border rounded-md
-                           focus:outline-none focus:ring-2 focus:ring-red-400 active:ring-red-500"
-              >
-                <option value={5}>⭐⭐⭐⭐⭐ (5)</option>
-                <option value={4}>⭐⭐⭐⭐ (4)</option>
-                <option value={3}>⭐⭐⭐ (3)</option>
-                <option value={2}>⭐⭐ (2)</option>
-                <option value={1}>⭐ (1)</option>
-              </select>
-            </div>
-            <button
-              type="submit"
-              className="text-sm mt-2 w-full bg-red-600 text-white py-2 rounded-md
-                         hover:bg-white hover:text-red-600
-                         focus:bg-red-500 focus:ring-2 focus:ring-red-400
-                         active:bg-red-700 transition-colors"
-            >
-              Kirim
-            </button>
-            {message && <p className="text-sm text-center mt-2 text-red-600">{message}</p>}
-          </form>
-        </div>
+      {/* FORM TESTIMONI */}
+      <motion.div className="w-full max-w-xl mx-auto mt-10 bg-white/80 border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-md backdrop-blur-sm">
+        <h2 className="text-lg sm:text-xl font-bold mb-4 text-center text-red-600">Testimoni</h2>
+        <form onSubmit={handleSubmitTestimoni} className="space-y-4 text-sm">
+          <textarea value={testimoni} onChange={(e) => setTestimoni(e.target.value)}
+            placeholder="Tulis pendapat kamu tentang M.GYM..."
+            className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400" rows={4} />
+          <div>
+            <label className="block mb-2">Rating:</label>
+            <select value={rating} onChange={(e) => setRating(Number(e.target.value))}
+              className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400">
+              <option value={5}>⭐⭐⭐⭐⭐ (5)</option>
+              <option value={4}>⭐⭐⭐⭐ (4)</option>
+              <option value={3}>⭐⭐⭐ (3)</option>
+              <option value={2}>⭐⭐ (2)</option>
+              <option value={1}>⭐ (1)</option>
+            </select>
+          </div>
+          <button type="submit"
+            className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-white hover:text-red-600 border border-red-600 transition">
+            Kirim
+          </button>
+          {message && <p className="text-center text-sm text-red-600">{message}</p>}
+        </form>
       </motion.div>
 
-      {/* Tombol Logout di Paling Bawah */}
-      <motion.div 
-        className="w-full max-w-md mx-auto mt-12 mb-8 text-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <button
-          onClick={handleLogout}
-          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md
-                     hover:bg-red-600 hover:text-white
-                     focus:outline-none focus:ring-2 focus:ring-red-400
-                     transition-colors duration-300"
-        >
+      {/* LOGOUT */}
+      <motion.div className="w-full max-w-xl mx-auto mt-12 text-center">
+        <button onClick={handleLogout}
+          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-red-600 hover:text-white transition">
           Logout
         </button>
       </motion.div>
     </main>
   );
-} 
+}

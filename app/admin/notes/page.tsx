@@ -68,9 +68,12 @@ export default function AdminNotes() {
 
   return (
     <div className="min-h-screen p-6 bg-black font-jakarta">
-      <h1 className="text-3xl md:text-3xl italic font-semibold text-white mb-6 tracking-tight">
+      <h1 className="text-2xl italic font-semibold text-white mb-6 tracking-tight">
         DASHBOARD NOTES
       </h1>
+      <p className="text-sm mb-5 font-[Plus Jakarta Sans] italic text-white bg-clip-text">
+        Halaman catatan to-do list admin M.GYM.
+      </p>
 
       {/* Grid utama */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -125,12 +125,12 @@ export default function MembersList() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 font-sans bg-black/50 min-h-screen">
-      <h2 className="text-3xl font-semibold italic mb-8 font-[Plus Jakarta Sans]  text-white bg-clip-text">
-        TABEL DAFTAR MEMBERSHIP
+      <h2 className="text-2xl font-semibold mb-1 font-[Plus Jakarta Sans]  text-white bg-clip-text">
+        TABEL MEMBER
       </h2>
 
-      <h3 className="text-sm mb-8 font-[Plus Jakarta Sans] text-white/15 bg-clip-text">
-        Rotasi layar kamu saat ini untuk pengalaman lebih baik.
+      <h3 className="text-sm mb-8 italic font-[Plus Jakarta Sans] text-white bg-clip-text">
+        Halaman hapus dan edit data membership M.GYM.
       </h3>
 
       <input

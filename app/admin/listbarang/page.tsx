@@ -127,7 +127,10 @@ export default function BarangList() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 font-sans bg-black/50 min-h-screen text-white">
-      <h2 className="text-3xl font-semibold italic mb-8">DAFTAR BARANG</h2>
+      <h2 className="text-2xl font-semibold italic mb-2">DAFTAR BARANG</h2>
+      <p className="text-sm mb-8 font-[Plus Jakarta Sans] italic text-white bg-clip-text">
+        Halaman masuk, keluar, dan edit data stok barang M.GYM.
+      </p>
 
       <form onSubmit={handleAddSubmit} className="bg-black border border-white/10 p-4 rounded-lg mb-6 space-y-3">
         <h3 className="text-xl font-semibold text-red-600 mb-2">Tambah Barang Baru</h3>
