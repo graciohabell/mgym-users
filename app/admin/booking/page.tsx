@@ -49,7 +49,7 @@ export default function BookingList() {
   const fetchBookings = async () => {
     setLoading(true);
 
-    // 1️⃣ fetch semua bookings
+    
     const { data: bookingsData, error: bookingsError } = await supabase
       .from('bookings')
       .select('*')
@@ -61,17 +61,17 @@ export default function BookingList() {
       return;
     }
 
-    // 2️⃣ fetch semua members
+    
     const { data: membersData } = await supabase
       .from('members')
       .select('id, nama');
 
-    // 3️⃣ fetch semua trainers
+    
     const { data: trainersData } = await supabase
       .from('trainer_list')
       .select('id, nama');
 
-    // 4️⃣ map booking + attach nama member & trainer
+    
     const mapped: Booking[] = (bookingsData as BookingDB[]).map((b) => ({
       id: b.id,
       member_id: b.member_id,
