@@ -7,8 +7,6 @@ import { supabase } from '@/lib/supabase'
 export default function SignUpPage() {
   const router = useRouter()
   const [nama, setNama] = useState('')
-  const [noHp, setNoHp] = useState('')
-  const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -24,7 +22,7 @@ export default function SignUpPage() {
     e.preventDefault()
     setModalMsg('')
 
-    if (!nama || !noHp || !email || !username || !password || !confirmPassword) {
+    if (!nama || !username || !password || !confirmPassword) {
       return showModal('Semua field wajib diisi.', 'error')
     }
 
@@ -45,12 +43,11 @@ export default function SignUpPage() {
     const { data: existingMember, error: fetchError } = await supabase
       .from('members')
       .select('id, username, password')
-      .eq('email', email)
-      .eq('no_hp', noHp)
+      .eq('nama', nama) // sesuaikan dengan DB baru tanpa email/no_hp
       .single()
 
     if (fetchError || !existingMember) {
-      return showModal('Data tidak ditemukan. Pastikan email & no HP sudah diinput oleh admin.', 'error')
+      return showModal('Data tidak ditemukan. Pastikan nama sudah diinput oleh admin.', 'error')
     }
 
     if (existingMember.username) {
@@ -91,22 +88,18 @@ export default function SignUpPage() {
           className="space-y-4 text-white"
           style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
         >
-          {['Nama', 'No HP', 'Email', 'Username', 'Password', 'Konfirmasi Password'].map((label, i) => (
+          {['Nama', 'Username', 'Password', 'Konfirmasi Password'].map((label, i) => (
             <input
               key={i}
-              type={label.includes('Password') ? 'password' : label === 'No HP' ? 'tel' : label === 'Email' ? 'email' : 'text'}
+              type={label.includes('Password') ? 'password' : 'text'}
               placeholder={label}
               value={
                 label === 'Nama' ? nama :
-                label === 'No HP' ? noHp :
-                label === 'Email' ? email :
                 label === 'Username' ? username :
                 label === 'Password' ? password : confirmPassword
               }
               onChange={(e) => {
                 if (label === 'Nama') setNama(e.target.value)
-                else if (label === 'No HP') setNoHp(e.target.value)
-                else if (label === 'Email') setEmail(e.target.value)
                 else if (label === 'Username') setUsername(e.target.value)
                 else if (label === 'Password') setPassword(e.target.value)
                 else setConfirmPassword(e.target.value)

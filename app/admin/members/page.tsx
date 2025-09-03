@@ -7,8 +7,6 @@ import '../../globals.css';
 interface Member {
   id: string;
   nama: string;
-  email: string;
-  no_hp: string;
   tgl_daftar: string;
   tgl_berakhir: string;
 }
@@ -19,12 +17,9 @@ export default function MembersList() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-  
   const [editMember, setEditMember] = useState<Member | null>(null);
   const [editForm, setEditForm] = useState({
     nama: '',
-    email: '',
-    no_hp: '',
     tgl_daftar: '',
     tgl_berakhir: '',
   });
@@ -38,7 +33,7 @@ export default function MembersList() {
     setLoading(true);
     const { data, error } = await supabase
       .from('members')
-      .select('id, nama, email, no_hp, tgl_daftar, tgl_berakhir')
+      .select('id, nama, tgl_daftar, tgl_berakhir')
       .order('tgl_daftar', { ascending: false });
 
     if (!error && data) setMembers(data);
@@ -59,8 +54,6 @@ export default function MembersList() {
     setEditMember(member);
     setEditForm({
       nama: member.nama,
-      email: member.email,
-      no_hp: member.no_hp,
       tgl_daftar: member.tgl_daftar,
       tgl_berakhir: member.tgl_berakhir,
     });
@@ -75,38 +68,30 @@ export default function MembersList() {
     e.preventDefault();
     setEditError('');
 
-    
-    if (
-      !editForm.nama.trim() ||
-      !editForm.email.trim() ||
-      !editForm.no_hp.trim() ||
-      !editForm.tgl_daftar.trim() ||
-      !editForm.tgl_berakhir.trim()
-    ) {
+    if (!editForm.nama.trim() || !editForm.tgl_daftar.trim() || !editForm.tgl_berakhir.trim()) {
       setEditError('Semua field wajib diisi ya!');
       return;
     }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('members')
       .update({
         nama: editForm.nama,
-        email: editForm.email,
-        no_hp: editForm.no_hp,
         tgl_daftar: editForm.tgl_daftar,
         tgl_berakhir: editForm.tgl_berakhir,
       })
       .eq('id', editMember!.id);
 
-    if (!error) {
+    if (error) {
+      console.error('Supabase update error:', error);
+      setEditError(`Gagal update: ${error.message}`);
+    } else {
       setMembers((prev) =>
         prev.map((m) =>
           m.id === editMember!.id
             ? {
                 ...m,
                 nama: editForm.nama,
-                email: editForm.email,
-                no_hp: editForm.no_hp,
                 tgl_daftar: editForm.tgl_daftar,
                 tgl_berakhir: editForm.tgl_berakhir,
               }
@@ -114,8 +99,6 @@ export default function MembersList() {
         )
       );
       setEditMember(null);
-    } else {
-      setEditError('Gagal update member.');
     }
   };
 
@@ -149,22 +132,13 @@ export default function MembersList() {
           </div>
         </div>
       ) : filteredMembers.length === 0 ? (
-        <p className="text-gray-400 font-[Plus Jakarta Sans]">
-          Member tidak ditemukan.
-        </p>
+        <p className="text-gray-400 font-[Plus Jakarta Sans]">Member tidak ditemukan.</p>
       ) : (
-        <div className="overflow-x-auto rounded-md border border-white/10 ">
+        <div className="overflow-x-auto rounded-md border border-white/10">
           <table className="w-full text-left font-[Plus Jakarta Sans]">
             <thead className="bg-white/10">
               <tr>
-                {[
-                  'Nama',
-                  'Email',
-                  'No HP',
-                  'Tanggal Daftar',
-                  'Tanggal Berakhir',
-                  'Aksi',
-                ].map((header) => (
+                {['Nama', 'Tanggal Daftar', 'Tanggal Berakhir', 'Aksi'].map((header) => (
                   <th
                     key={header}
                     className="px-4 py-3 uppercase tracking-wider text-white font-semibold border-b border-white/10 text-xs"
@@ -176,34 +150,19 @@ export default function MembersList() {
             </thead>
             <tbody className="divide-y divide-white/10 bg-black">
               {filteredMembers.map((m) => (
-                <tr
-                  key={m.id}
-                  className="hover:bg-white/10 transition-all duration-300 group"
-                >
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-300 font-medium text-sm">
-                    {m.nama}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
-                    {m.email}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
-                    {m.no_hp}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
-                    {m.tgl_daftar}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
-                    {m.tgl_berakhir}
-                  </td>
+                <tr key={m.id} className="hover:bg-white/10 transition-all duration-300 group">
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-300 font-medium text-sm">{m.nama}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">{m.tgl_daftar}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">{m.tgl_berakhir}</td>
                   <td className="px-4 py-3 whitespace-nowrap space-x-2">
                     <button
-                      className=" text-white/50 hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300 "
+                      className="text-white/50 hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300"
                       onClick={() => openEdit(m)}
                     >
                       EDIT
                     </button>
                     <button
-                      className=" text-red-500 hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300 "
+                      className="text-red-500 hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300"
                       onClick={() => setConfirmDeleteId(m.id)}
                     >
                       X
@@ -218,14 +177,10 @@ export default function MembersList() {
 
       {/* Pop Up Delete Confirmation */}
       {confirmDeleteId && (
-        <div className="fixed inset-0 flex justify-center items-center z-50 ">
-          <div
-            className=" bg-red-600 text-white rounded-lg shadow-lg w-60 text-center p-4 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards]"
-          >
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="bg-red-600 text-white rounded-lg shadow-lg w-60 text-center p-4 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards]">
             <h3 className="text-lg font-semibold text-white mb-2">Hapus ?</h3>
-            <p className="text-gray-300 mb-2">
-              Yakin menghapus member ini?
-            </p>
+            <p className="text-gray-300 mb-2">Yakin menghapus member ini?</p>
             <div className="grid grid-cols-2 border-t rounded-2xl border-red-900/50">
               <button
                 onClick={() => setConfirmDeleteId(null)}
@@ -248,9 +203,7 @@ export default function MembersList() {
       {editMember && (
         <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/60 p-4">
           <div className="bg-black border border-white/10 rounded-lg shadow-lg w-full max-w-md p-6 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards] font-[Plus Jakarta Sans]">
-            <h3 className="text-xl font-semibold text-red-600 mb-4 text-center">
-              Edit Member
-            </h3>
+            <h3 className="text-xl font-semibold text-red-600 mb-4 text-center">Edit Member</h3>
             <form onSubmit={handleEditSubmit} className="space-y-4 text-white text-sm">
               <div>
                 <label className="block mb-1">Nama:</label>
@@ -258,26 +211,6 @@ export default function MembersList() {
                   type="text"
                   value={editForm.nama}
                   onChange={(e) => handleEditChange('nama', e.target.value)}
-                  className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-1">Email:</label>
-                <input
-                  type="email"
-                  value={editForm.email}
-                  onChange={(e) => handleEditChange('email', e.target.value)}
-                  className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-1">No HP:</label>
-                <input
-                  type="text"
-                  value={editForm.no_hp}
-                  onChange={(e) => handleEditChange('no_hp', e.target.value)}
                   className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
                   required
                 />
@@ -302,9 +235,7 @@ export default function MembersList() {
                   required
                 />
               </div>
-              {editError && (
-                <p className="text-red-500 text-center">{editError}</p>
-              )}
+              {editError && <p className="text-red-500 text-center">{editError}</p>}
               <div className="flex justify-between mt-6">
                 <button
                   type="button"
