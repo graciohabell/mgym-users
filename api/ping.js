@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
     try {
-      const r = await fetch("https://<YOUR_PROJECT>.supabase.co/rest/v1/APIAPIAPI?limit=1", {
+      const r = await fetch("https://<MGYM-USERS>.supabase.co/rest/v1/APIAPIAPI?limit=1", {
         headers: {
           apikey: process.env.SUPABASE_ANON_KEY,
           Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
