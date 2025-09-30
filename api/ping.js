@@ -1,15 +1,15 @@
 export default async function handler(req, res) {
     try {
-      const r = await fetch("https://iilbqhjwoyakuvckkqfx.supabase.co/rest/v1/APIAPIAPI?id=eq.1", {
+      const r = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/APIAPIAPI?id=eq.1`, {
         method: "PATCH",
         headers: {
-          apikey: process.env.SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
           "Content-Type": "application/json",
-          Prefer: "return=representation", 
+          Prefer: "return=representation",
         },
         body: JSON.stringify({
-          dummy: Date.now(), 
+          dummy: Date.now(),
         }),
       });
   
