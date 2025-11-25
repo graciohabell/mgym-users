@@ -25,12 +25,6 @@ export default function MembersList() {
   });
   const [editError, setEditError] = useState('');
 
-  const [extendMember, setExtendMember] = useState<Member | null>(null);
-  const [confirmExtend, setConfirmExtend] = useState<{
-    id: string;
-    months: number;
-  } | null>(null);
-
   useEffect(() => {
     fetchMembers();
   }, []);
@@ -89,7 +83,6 @@ export default function MembersList() {
       .eq('id', editMember!.id);
 
     if (error) {
-      console.error('Supabase update error:', error);
       setEditError(`Gagal update: ${error.message}`);
     } else {
       setMembers((prev) =>
@@ -108,45 +101,21 @@ export default function MembersList() {
     }
   };
 
-  const openExtend = (member: Member) => {
-    setExtendMember(member);
-  };
-
-  const handleExtend = (months: number) => {
-    if (!extendMember) return;
-    setConfirmExtend({ id: extendMember.id, months });
-  };
-
-  const confirmExtendSubmit = async () => {
-    if (!confirmExtend) return;
-    const member = members.find((m) => m.id === confirmExtend.id);
-    if (!member) return;
-
-    const currentEnd = new Date(member.tgl_berakhir);
-    const newEnd = new Date(currentEnd.setMonth(currentEnd.getMonth() + confirmExtend.months));
-    const newDateStr = newEnd.toISOString().split('T')[0];
-
-    const { error } = await supabase
-      .from('members')
-      .update({ tgl_berakhir: newDateStr })
-      .eq('id', member.id);
-
-    if (!error) {
-      setMembers((prev) =>
-        prev.map((m) =>
-          m.id === member.id ? { ...m, tgl_berakhir: newDateStr } : m
-        )
-      );
-      setConfirmExtend(null);
-      setExtendMember(null);
-    } else {
-      alert('Gagal memperpanjang member.');
-    }
-  };
-
   const filteredMembers = members.filter((m) =>
     m.nama.toLowerCase().includes(searchKeyword.toLowerCase())
   );
+
+  
+  const getStatusColor = (tgl_berakhir: string) => {
+    const now = new Date();
+    const end = new Date(tgl_berakhir);
+
+    const diff = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diff < 0) return 'bg-red-600';           // expired
+    if (diff <= 7) return 'bg-yellow-500';       // hampir expired
+    return 'bg-green-600';                       // aktif
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-6 font-sans bg-black/50 min-h-screen">
@@ -155,7 +124,7 @@ export default function MembersList() {
       </h2>
 
       <h3 className="text-sm mb-8 italic font-[Plus Jakarta Sans] text-white bg-clip-text">
-        Halaman hapus, edit dan perpanjang data membership M.GYM.
+        Halaman hapus dan edit data membership M.GYM.
       </h3>
 
       <input
@@ -180,7 +149,7 @@ export default function MembersList() {
           <table className="w-full text-left font-[Plus Jakarta Sans]">
             <thead className="bg-white/10">
               <tr>
-                {['Nama', 'Tanggal Daftar', 'Tanggal Berakhir', 'Aksi'].map((header) => (
+                {['Nama', 'Tanggal Daftar', 'Tanggal Berakhir', 'Status', 'Aksi'].map((header) => (
                   <th
                     key={header}
                     className="px-4 py-3 uppercase tracking-wider text-white font-semibold border-b border-white/10 text-xs"
@@ -196,6 +165,12 @@ export default function MembersList() {
                   <td className="px-4 py-3 whitespace-nowrap text-gray-300 font-medium text-sm">{m.nama}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">{m.tgl_daftar}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">{m.tgl_berakhir}</td>
+
+                  {/* STATUS COLOR */}
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className={`w-4 h-4 rounded-full ${getStatusColor(m.tgl_berakhir)}`}></div>
+                  </td>
+
                   <td className="px-4 py-3 whitespace-nowrap space-x-2">
                     <button
                       className="text-white/50 hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300"
@@ -203,12 +178,7 @@ export default function MembersList() {
                     >
                       EDIT
                     </button>
-                    <button
-                      className="text-green-400 hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300"
-                      onClick={() => openExtend(m)}
-                    >
-                      PERPANJANG
-                    </button>
+
                     <button
                       className="text-red-500 hover:text-white px-3 py-1 rounded-md text-xs transition-all duration-300"
                       onClick={() => setConfirmDeleteId(m.id)}
@@ -247,7 +217,7 @@ export default function MembersList() {
         </div>
       )}
 
-      {/* Pop Up Edit Member */}
+      {/* EDIT POPUP */}
       {editMember && (
         <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/60 p-4">
           <div className="bg-black border border-white/10 rounded-lg shadow-lg w-full max-w-md p-6 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards] font-[Plus Jakarta Sans]">
@@ -300,57 +270,6 @@ export default function MembersList() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Pop Up Perpanjang Member */}
-      {extendMember && !confirmExtend && (
-        <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/60 p-4">
-          <div className="bg-black border border-white/10 rounded-lg shadow-lg w-full max-w-sm p-6 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards] font-[Plus Jakarta Sans] text-center">
-            <h3 className="text-xl font-semibold text-green-500 mb-4">Perpanjang Member</h3>
-            <p className="text-gray-300 mb-4">Pilih durasi perpanjangan untuk <span className="text-white font-semibold">{extendMember.nama}</span></p>
-            <div className="grid grid-cols-3 gap-2 mb-6">
-              {[1, 2, 3].map((month) => (
-                <button
-                  key={month}
-                  onClick={() => handleExtend(month)}
-                  className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-all duration-300"
-                >
-                  {month} Bulan
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setExtendMember(null)}
-              className="px-4 py-2 bg-red-600 rounded-md hover:bg-red-700 text-white transition-colors"
-            >
-              Batal
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Konfirmasi Yakin/Tidak Perpanjang */}
-      {confirmExtend && (
-        <div className="fixed inset-0 flex justify-center items-center z-50">
-          <div className="bg-green-700 text-white rounded-lg shadow-lg w-60 text-center p-4 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards]">
-            <h3 className="text-lg font-semibold text-white mb-2">Konfirmasi</h3>
-            <p className="text-gray-200 mb-2">Yakin perpanjang {confirmExtend.months} bulan?</p>
-            <div className="grid grid-cols-2 border-t rounded-2xl border-green-900/50">
-              <button
-                onClick={() => setConfirmExtend(null)}
-                className="py-3 text-white font-medium hover:bg-green-950/50 transition-colors"
-              >
-                Tidak
-              </button>
-              <button
-                onClick={confirmExtendSubmit}
-                className="py-3 text-white font-medium hover:bg-green-950/50 transition-colors border-l border-green-900/50"
-              >
-                Yakin
-              </button>
-            </div>
           </div>
         </div>
       )}
