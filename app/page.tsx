@@ -3,16 +3,19 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import vader from 'vader-sentiment';
 
 interface Testimonial {
   id: string;
   nama: string;
   testimoni: string;
   rating: number;
+  score?: number;
 }
 
 export default function Home() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [highlightedTestimonials, setHighlightedTestimonials] = useState<Testimonial[]>([]);
   const [showSplash, setShowSplash] = useState(true);
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
 
@@ -22,8 +25,21 @@ export default function Home() {
         .from('testimonials')
         .select('id, nama, testimoni, rating')
         .order('tanggal_input', { ascending: false })
-        .limit(10);
-      if (!error && data) setTestimonials(data);
+        .limit(50); // ambil banyak biar AI bisa rank
+
+      if (!error && data) {
+        setTestimonials(data);
+
+        // AI Sentiment Scoring
+        const scored = data.map((t) => {
+          const sentiment = vader.SentimentIntensityAnalyzer.polarity_scores(t.testimoni);
+          return { ...t, score: sentiment.compound };
+        });
+
+        // Sort by sentiment descending, ambil top 5
+        const top5 = scored.sort((a, b) => b.score - a.score).slice(0, 5);
+        setHighlightedTestimonials(top5);
+      }
     };
 
     fetchTestimonials();
@@ -86,7 +102,8 @@ export default function Home() {
     {
       id: 2,
       title: 'Membership Umum & Khusus Pelajar',
-      subtitle: '/// Paket 1 Bulan Umum Rp120.000, Paket 6 Bulan Umum Rp660.000, dan Paket 1 Bulan Pelajar Rp110.000.',
+      subtitle:
+        '/// Paket 1 Bulan Umum Rp120.000, Paket 6 Bulan Umum Rp660.000, dan Paket 1 Bulan Pelajar Rp110.000.',
       image: '/images/mgymbg2.jpg',
     },
     {
@@ -112,45 +129,45 @@ export default function Home() {
 
   return (
     <main className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth font-body">
-     <nav
-  className={`fixed top-0 left-0 z-50 w-full px-6 py-4 flex justify-between items-center text-white transition-all duration-500 bg-black/20 backdrop-blur-sm ${
-    isNavbarVisible
-      ? 'opacity-100 pointer-events-auto translate-y-0'
-      : 'opacity-0 pointer-events-none -translate-y-full'
-  }`}
->
-  <div className="flex items-center gap-2">
-    <img
-      src="/images/logo-mgym.jpg"
-      alt="Logo M.GYM"
-      className="h-8 w-8 object-contain"
-    />
-    <h1
-      className="text-xl md:text-2xl font-display italic font-extrabold text-red-600 tracking-wide"
-      style={{ fontFamily: 'Tomorrow, sans-serif' }}
-    >
-      M.GYM
-    </h1>
-  </div>
+      {/* Navbar */}
+      <nav
+        className={`fixed top-0 left-0 z-50 w-full px-6 py-4 flex justify-between items-center text-white transition-all duration-500 bg-black/20 backdrop-blur-sm ${
+          isNavbarVisible
+            ? 'opacity-100 pointer-events-auto translate-y-0'
+            : 'opacity-0 pointer-events-none -translate-y-full'
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <img
+            src="/images/logo-mgym.jpg"
+            alt="Logo M.GYM"
+            className="h-8 w-8 object-contain"
+          />
+          <h1
+            className="text-xl md:text-2xl font-display italic font-extrabold text-red-600 tracking-wide"
+            style={{ fontFamily: 'Tomorrow, sans-serif' }}
+          >
+            M.GYM
+          </h1>
+        </div>
 
-  <div className="flex items-center gap-3">
-    <a
-      href="/membership"
-      className="text-sm px-3 py-1 rounded-md text-red-600 font-display italic font-extrabold hover:bg-white/30 active:shadow-inner transition duration-150 ease-in-out"
-      style={{ fontFamily: 'Tomorrow, sans-serif' }}
-    >
-      MEMBER
-    </a>
-    <a
-      href="/login-admin"
-      className="text-sm px-3 py-1 rounded-md text-red-600 font-display italic font-extrabold hover:bg-white/30 active:shadow-inner transition duration-150 ease-in-out"
-      style={{ fontFamily: 'Tomorrow, sans-serif' }}
-    >
-      ADMIN
-    </a>
-  </div>
-</nav>
-
+        <div className="flex items-center gap-3">
+          <a
+            href="/membership"
+            className="text-sm px-3 py-1 rounded-md text-red-600 font-display italic font-extrabold hover:bg-white/30 active:shadow-inner transition duration-150 ease-in-out"
+            style={{ fontFamily: 'Tomorrow, sans-serif' }}
+          >
+            MEMBER
+          </a>
+          <a
+            href="/login-admin"
+            className="text-sm px-3 py-1 rounded-md text-red-600 font-display italic font-extrabold hover:bg-white/30 active:shadow-inner transition duration-150 ease-in-out"
+            style={{ fontFamily: 'Tomorrow, sans-serif' }}
+          >
+            ADMIN
+          </a>
+        </div>
+      </nav>
 
       {/* Hero Sections */}
       {sections.map((sec) => (
@@ -199,7 +216,7 @@ export default function Home() {
             <div className="mt-6 w-full max-w-[700px]">
               <div className="rounded-xl overflow-hidden border border-white w-full h-[260px] md:h-[300px]">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.911183446087!2d106.79761407370475!3d-6.532900763862933!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c34671e96f25%3A0x40242bbc8fe38a78!2sM%20GYM!5e0!3m2!1sid!2sid!4v1754672849735!5m2!1sid!2sid" 
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.911183446087!2d106.79761407370475!3d-6.532900763862933!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c34671e96f25%3A0x40242bbc8fe38a78!2sM%20GYM!5e0!3m2!1sid!2sid!4v1754672849735!5m2!1sid!2sid"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
@@ -222,14 +239,15 @@ export default function Home() {
           Apa Kata Mereka Yang Telah Bergabung Bersama Kami ?
         </h2>
 
+        {/* AI Highlighted Testimoni */}
         <div className="flex flex-wrap gap-4 pb-4 px-2 w-full max-w-5xl">
-          {testimonials.length === 0 ? (
+          {highlightedTestimonials.length === 0 ? (
             <p className="text-gray-500 text-sm">Harap Tunggu...</p>
           ) : (
-            testimonials.slice(0, 6).map((t, i) => (
+            highlightedTestimonials.map((t, i) => (
               <motion.div
                 key={t.id}
-                className="snap-center flex-shrink-0 w-70 p-2 bg-black borderrounded-xl shadow-md"
+                className="snap-center flex-shrink-0 w-70 p-2 bg-black borderrounded-xl shadow-md border-l-4 border-green-400"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}

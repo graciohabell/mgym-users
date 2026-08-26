@@ -12,7 +12,11 @@ interface SidebarProps {
 }
 
 function SidebarIcon({ iconClass }: { iconClass: string }) {
-  return <i className={`bi ${iconClass} w-4 h-4 mr-3 flex-shrink-0 text-white/60`}></i>;
+  return (
+    <i
+      className={`bi ${iconClass} w-4 h-4 mr-3 flex-shrink-0 text-white/60`}
+    ></i>
+  );
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -23,9 +27,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const handleClickOutside = (event: MouseEvent) => {
       const sidebar = document.querySelector('aside');
       const overlay = document.querySelector('.sidebar-overlay');
-      
-      if (isOpen && sidebar && !sidebar.contains(event.target as Node) && 
-          overlay && overlay.contains(event.target as Node)) {
+
+      if (
+        isOpen &&
+        sidebar &&
+        !sidebar.contains(event.target as Node) &&
+        overlay &&
+        overlay.contains(event.target as Node)
+      ) {
         onClose();
       }
     };
@@ -51,7 +60,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <AnimatePresence>
         {isOpen && (
           <>
-            
+            {/* OVERLAY */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -60,7 +69,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               className="fixed inset-0 bg-black/50 z-40 sidebar-overlay"
               onClick={onClose}
             />
-            
+
+            {/* SIDEBAR */}
             <motion.aside
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
@@ -69,46 +79,110 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               className="fixed top-0 left-0 h-full w-48 bg-black shadow-xl z-50 border-2 border-white/10 flex flex-col justify-between"
             >
               <div>
+                {/* HEADER */}
                 <div className="flex justify-between items-center p-4 border-1 border-white/10">
-                  <h2 className="text-red-600 font-[Plus Jakarta Sans]">.</h2>
+                  <h2 className="text-red-600 font-[Plus Jakarta Sans]">
+                    .
+                  </h2>
                 </div>
 
+                {/* NAVIGATION */}
                 <nav className="p-2 rounded-lg space-x-0">
-                  <Link href="/admin/add-member" className={linkClass} onClick={onClose}>
+
+                  {/* MEMBERSHIP */}
+                  <Link
+                    href="/admin/add-member"
+                    className={linkClass}
+                    onClick={onClose}
+                  >
                     <SidebarIcon iconClass="bi-person-plus" />
                     Membership
                   </Link>
-                  <Link href="/admin/members" className={linkClass} onClick={onClose}>
+
+                  {/* TABEL MEMBER */}
+                  <Link
+                    href="/admin/members"
+                    className={linkClass}
+                    onClick={onClose}
+                  >
                     <SidebarIcon iconClass="bi-people" />
                     Tabel Member
                   </Link>
-                  <Link href="/admin/booking" className={linkClass} onClick={onClose}>
+
+                  {/* QR SCANNER */}
+                  <Link
+                    href="/admin/qr-scanner"
+                    className={linkClass}
+                    onClick={onClose}
+                  >
+                    <SidebarIcon iconClass="bi-qr-code-scan" />
+                    QR Scanner
+                  </Link>
+
+                  {/* JADWAL TRAINER */}
+                  <Link
+                    href="/admin/booking"
+                    className={linkClass}
+                    onClick={onClose}
+                  >
                     <SidebarIcon iconClass="bi-calendar-check" />
                     Jadwal Trainer
                   </Link>
-                  <Link href="/admin/listbarang" className={linkClass} onClick={onClose}>
+
+                  {/* TABEL BARANG */}
+                  <Link
+                    href="/admin/listbarang"
+                    className={linkClass}
+                    onClick={onClose}
+                  >
                     <SidebarIcon iconClass="bi-box-seam" />
                     Tabel Barang
                   </Link>
-                  <Link href="/admin/historystok" className={linkClass} onClick={onClose}>
-                    <SidebarIcon iconClass="bi bi-journals" />
+
+                  {/* IN-OUT BARANG */}
+                  <Link
+                    href="/admin/historystok"
+                    className={linkClass}
+                    onClick={onClose}
+                  >
+                    <SidebarIcon iconClass="bi-journals" />
                     In-Out Barang
                   </Link>
-                  <Link href="/admin/testimoni" className={linkClass} onClick={onClose}>
+
+                  {/* TESTIMONI */}
+                  <Link
+                    href="/admin/testimoni"
+                    className={linkClass}
+                    onClick={onClose}
+                  >
                     <SidebarIcon iconClass="bi-chat-left-quote" />
                     Testimoni
                   </Link>
-                  <Link href="/admin/statistik" className={linkClass} onClick={onClose}>
+
+                  {/* STATISTIK */}
+                  <Link
+                    href="/admin/statistik"
+                    className={linkClass}
+                    onClick={onClose}
+                  >
                     <SidebarIcon iconClass="bi-graph-up" />
                     Statistik
                   </Link>
-                  <Link href="/admin/notes" className={linkClass} onClick={onClose}>
+
+                  {/* CATATAN */}
+                  <Link
+                    href="/admin/notes"
+                    className={linkClass}
+                    onClick={onClose}
+                  >
                     <SidebarIcon iconClass="bi-journal-text" />
                     Catatan
                   </Link>
+
                 </nav>
               </div>
 
+              {/* LOGOUT */}
               <div className="p-2 border-t border-white/10">
                 <button
                   onClick={() => setShowConfirm(true)}
@@ -122,6 +196,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       </AnimatePresence>
 
+      {/* LOGOUT CONFIRMATION */}
       <AnimatePresence>
         {showConfirm && (
           <motion.div
@@ -132,25 +207,31 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             className="fixed inset-0 flex justify-center items-center z-[60] pointer-events-none"
           >
             <div className="bg-red-600 rounded-lg shadow-lg shadow-black/30 w-80 text-center p-6 pointer-events-auto">
+
               <h3 className="text-sm font-semibold text-white mb-2 font-[Plus Jakarta Sans]">
                 Logout?
               </h3>
+
               <p className="text-white/80 mb-4 font-[Plus Jakarta Sans]">
                 Yakin mau keluar dari dashboard?
               </p>
+
               <div className="grid grid-cols-2 border-t border-red-400/50">
+
                 <button
                   onClick={() => setShowConfirm(false)}
                   className="py-3 text-white font-medium hover:bg-red-500/50 transition-colors font-[Plus Jakarta Sans]"
                 >
                   Batal
                 </button>
+
                 <button
                   onClick={handleLogout}
                   className="py-3 text-white font-medium hover:bg-red-700 transition-colors border-l border-red-400/50 font-[Plus Jakarta Sans]"
                 >
                   Yakin
                 </button>
+
               </div>
             </div>
           </motion.div>

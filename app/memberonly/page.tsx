@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import QRCode from 'qrcode';
 import { supabase } from '@/lib/supabase';
 
 interface MemberData {
@@ -40,6 +41,8 @@ export default function MemberOnlyPage() {
   const [expired, setExpired] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const [qrCode, setQrCode] = useState<string>('');
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [trainers, setTrainers] = useState<Trainer[]>([]);
 
@@ -71,11 +74,27 @@ export default function MemberOnlyPage() {
       const today = new Date();
       const endDate = new Date(data.tgl_berakhir);
       const diffTime = endDate.getTime() - today.getTime();
-      const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const daysRemaining = Math.ceil(
+        diffTime / (1000 * 60 * 60 * 24)
+      );
 
       setMember(data);
       setDaysLeft(daysRemaining);
       setExpired(daysRemaining < 0);
+
+      // Generate QR Code menggunakan member.id
+      try {
+        const generatedQr = await QRCode.toDataURL(data.id, {
+          width: 220,
+          margin: 2,
+          errorCorrectionLevel: 'H',
+        });
+
+        setQrCode(generatedQr);
+      } catch (qrError) {
+        console.error('Gagal generate QR Code:', qrError);
+      }
+
       setLoading(false);
     };
 
@@ -104,7 +123,12 @@ export default function MemberOnlyPage() {
           tanggal: b.tanggal,
           jam: b.jam,
           status: b.status,
-          trainer: { nama: b.trainer && b.trainer.length > 0 ? b.trainer[0].nama : '-' },
+          trainer: {
+            nama:
+              b.trainer && b.trainer.length > 0
+                ? b.trainer[0].nama
+                : '-',
+          },
         }))
       );
     }
@@ -127,6 +151,7 @@ export default function MemberOnlyPage() {
 
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!tanggal || !jam || !trainerId || !member) {
       setBookingMessage('Isi semua field booking ya!');
       return;
@@ -155,6 +180,7 @@ export default function MemberOnlyPage() {
 
   const handleSubmitTestimoni = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!testimoni || !rating || !member) {
       setMessage('Isi semua form testimoni ya!');
       return;
@@ -193,58 +219,138 @@ export default function MemberOnlyPage() {
 
   return (
     <main className="min-h-screen w-full bg-white px-4 sm:px-6 md:px-10 pt-24 font-semibold pb-20 text-black/70 font-body">
-      
+
       {/* CARD INFO MEMBER */}
       <motion.div className="w-full max-w-xl mx-auto bg-white/80 border border-red-100 rounded-2xl p-6 sm:p-8 shadow-md text-center backdrop-blur-sm">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-red-600 tracking-wide mb-4 italic">
           M.GYM
         </h1>
-        <p className="text-base sm:text-lg">Selamat Datang, {member?.nama} !</p>
-        <p className="text-sm sm:text-base">
-          Membership aktif dari <span className="font-semibold">{member?.tgl_daftar}</span> sampai <span className="font-semibold">{member?.tgl_berakhir}</span>.
+
+        <p className="text-base sm:text-lg">
+          Selamat Datang, {member?.nama} !
         </p>
+
+        <p className="text-sm sm:text-base">
+          Membership aktif dari{' '}
+          <span className="font-semibold">{member?.tgl_daftar}</span>{' '}
+          sampai{' '}
+          <span className="font-semibold">{member?.tgl_berakhir}</span>.
+        </p>
+
         {!expired && daysLeft !== null && (
-          <p className={`mt-2 font-bold ${daysLeft <= 7 ? 'text-red-700' : 'text-green-700'}`}>
-            {daysLeft <= 7 ? `BERAKHIR DALAM ${daysLeft} HARI` : 'MASIH AKTIF'}
+          <p
+            className={`mt-2 font-bold ${
+              daysLeft <= 7 ? 'text-red-700' : 'text-green-700'
+            }`}
+          >
+            {daysLeft <= 7
+              ? `BERAKHIR DALAM ${daysLeft} HARI`
+              : 'MASIH AKTIF'}
           </p>
         )}
-        {expired && <p className="text-red-700 font-bold">SUDAH JATUH TEMPO</p>}
+
+        {expired && (
+          <p className="text-red-700 font-bold">
+            SUDAH JATUH TEMPO
+          </p>
+        )}
+
+        {/* QR CODE */}
+        {qrCode && (
+          <div className="mt-6 flex flex-col items-center">
+            <img
+              src={qrCode}
+              alt="Membership QR Code"
+              className="w-[220px] h-[220px]"
+            />
+
+            <p className="mt-3 text-xs text-gray-500 font-medium">
+              Tunjukkan QR Code ini di front desk M.GYM
+            </p>
+          </div>
+        )}
       </motion.div>
 
       {/* FORM BOOKING */}
       <motion.div className="w-full max-w-xl mx-auto mt-10 bg-white/80 border border-red-100 rounded-2xl p-6 sm:p-8 shadow-md backdrop-blur-sm">
-        <h2 className="text-lg sm:text-xl font-bold mb-4 text-red-600">Booking Sesi Personal Trainer</h2>
+        <h2 className="text-lg sm:text-xl font-bold mb-4 text-red-600">
+          Booking Sesi Personal Trainer
+        </h2>
+
         <form onSubmit={handleBookingSubmit} className="space-y-4">
-          <input type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)}
-            className="w-full p-3 text-sm sm:text-base border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400" />
-          <input type="time" value={jam} onChange={(e) => setJam(e.target.value)}
-            className="w-full p-3 text-sm sm:text-base border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400" />
-          <select value={trainerId} onChange={(e) => setTrainerId(e.target.value)}
-            className="w-full p-3 text-sm sm:text-base border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400">
+          <input
+            type="date"
+            value={tanggal}
+            onChange={(e) => setTanggal(e.target.value)}
+            className="w-full p-3 text-sm sm:text-base border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400"
+          />
+
+          <input
+            type="time"
+            value={jam}
+            onChange={(e) => setJam(e.target.value)}
+            className="w-full p-3 text-sm sm:text-base border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400"
+          />
+
+          <select
+            value={trainerId}
+            onChange={(e) => setTrainerId(e.target.value)}
+            className="w-full p-3 text-sm sm:text-base border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400"
+          >
             <option value="">Pilih Trainer</option>
-            {trainers.map((t) => <option key={t.id} value={t.id}>{t.nama}</option>)}
+
+            {trainers.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.nama}
+              </option>
+            ))}
           </select>
-          <button type="submit"
-            className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-white hover:text-red-600 border border-red-600 transition">
+
+          <button
+            type="submit"
+            className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-white hover:text-red-600 border border-red-600 transition"
+          >
             Booking
           </button>
-          {bookingMessage && <p className="text-center text-sm text-red-600">{bookingMessage}</p>}
+
+          {bookingMessage && (
+            <p className="text-center text-sm text-red-600">
+              {bookingMessage}
+            </p>
+          )}
         </form>
       </motion.div>
 
       {/* LIST BOOKING */}
       <motion.div className="w-full max-w-xl mx-auto mt-8 bg-white/80 border border-red-100 rounded-2xl p-6 sm:p-8 shadow-md backdrop-blur-sm">
-        <h2 className="text-lg sm:text-xl font-bold mb-4 text-red-600">Jadwal Booking</h2>
+        <h2 className="text-lg sm:text-xl font-bold mb-4 text-red-600">
+          Jadwal Booking
+        </h2>
+
         {bookings.length === 0 ? (
           <p className="text-sm">Belum ada booking.</p>
         ) : (
           <ul className="space-y-3">
             {bookings.map((b) => (
-              <li key={b.id} className="p-3 bg-white rounded-lg shadow-sm text-sm">
-                <p><strong>Tanggal:</strong> {b.tanggal}</p>
-                <p><strong>Jam:</strong> {b.jam}</p>
-                <p><strong>Trainer:</strong> {b.trainer.nama}</p>
-                <p><strong>Status:</strong> {b.status}</p>
+              <li
+                key={b.id}
+                className="p-3 bg-white rounded-lg shadow-sm text-sm"
+              >
+                <p>
+                  <strong>Tanggal:</strong> {b.tanggal}
+                </p>
+
+                <p>
+                  <strong>Jam:</strong> {b.jam}
+                </p>
+
+                <p>
+                  <strong>Trainer:</strong> {b.trainer.nama}
+                </p>
+
+                <p>
+                  <strong>Status:</strong> {b.status}
+                </p>
               </li>
             ))}
           </ul>
@@ -253,15 +359,32 @@ export default function MemberOnlyPage() {
 
       {/* FORM TESTIMONI */}
       <motion.div className="w-full max-w-xl mx-auto mt-10 bg-white/80 border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-md backdrop-blur-sm">
-        <h2 className="text-lg sm:text-xl font-bold mb-4 text-center text-red-600">Testimoni</h2>
-        <form onSubmit={handleSubmitTestimoni} className="space-y-4 text-sm">
-          <textarea value={testimoni} onChange={(e) => setTestimoni(e.target.value)}
+        <h2 className="text-lg sm:text-xl font-bold mb-4 text-center text-red-600">
+          Testimoni
+        </h2>
+
+        <form
+          onSubmit={handleSubmitTestimoni}
+          className="space-y-4 text-sm"
+        >
+          <textarea
+            value={testimoni}
+            onChange={(e) => setTestimoni(e.target.value)}
             placeholder="Tulis pendapat kamu tentang M.GYM..."
-            className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400" rows={4} />
+            className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400"
+            rows={4}
+          />
+
           <div>
-            <label className="block mb-2">Rating:</label>
-            <select value={rating} onChange={(e) => setRating(Number(e.target.value))}
-              className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400">
+            <label className="block mb-2">
+              Rating:
+            </label>
+
+            <select
+              value={rating}
+              onChange={(e) => setRating(Number(e.target.value))}
+              className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-red-400"
+            >
               <option value={5}>⭐⭐⭐⭐⭐ (5)</option>
               <option value={4}>⭐⭐⭐⭐ (4)</option>
               <option value={3}>⭐⭐⭐ (3)</option>
@@ -269,18 +392,28 @@ export default function MemberOnlyPage() {
               <option value={1}>⭐ (1)</option>
             </select>
           </div>
-          <button type="submit"
-            className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-white hover:text-red-600 border border-red-600 transition">
+
+          <button
+            type="submit"
+            className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-white hover:text-red-600 border border-red-600 transition"
+          >
             Kirim
           </button>
-          {message && <p className="text-center text-sm text-red-600">{message}</p>}
+
+          {message && (
+            <p className="text-center text-sm text-red-600">
+              {message}
+            </p>
+          )}
         </form>
       </motion.div>
 
       {/* LOGOUT */}
       <motion.div className="w-full max-w-xl mx-auto mt-12 text-center">
-        <button onClick={handleLogout}
-          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-red-600 hover:text-white transition">
+        <button
+          onClick={handleLogout}
+          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-red-600 hover:text-white transition"
+        >
           Logout
         </button>
       </motion.div>
