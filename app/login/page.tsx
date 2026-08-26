@@ -42,7 +42,7 @@ export default function LoginPage() {
         <h1
           className="text-2xl font-display italic font-semibold text-white tracking-wide text-center"
         >
-          LOGIN M.GYM MEMBERSHIP
+          Claim QR Code kamu disini !
         </h1>
 
         <form onSubmit={handleLogin} className="space-y-4 text-white/80">
@@ -59,13 +59,13 @@ export default function LoginPage() {
             type="submit"
             className="w-full py-3 rounded-lg bg-red-600 text-white font-semibold transition hover:bg-red-500 focus:ring-2 focus:ring-red-400 active:bg-red-700"
           >
-            Login
+            Masuk
           </button>
 
         </form>
 
         <p className="text-sm md:text-base text-white text-center leading-relaxed">
-          Login menggunakan email yang terdaftar sebagai member M.GYM.
+          Masukkan alamat E-Mail kamu untuk masuk ke halaman personal membership M.GYM. 
         </p>
       </div>
 

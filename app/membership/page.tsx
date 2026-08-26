@@ -10,22 +10,11 @@ export default function MembershipPage() {
           className="text-xl sm:text-2xl font-display italic font-semibold text-white tracking-wide"
           style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
         >
-          M.GYM MEMBERSHIP
+          M.GYM Personal Member Page
         </h1>
 
         {/* Buttons */}
         <div className="flex flex-col gap-4 w-full">
-          <Link href="/signup" className="w-full">
-            <button
-              className="w-full px-5 py-2 sm:py-3 rounded-lg bg-red-600 text-white font-semibold text-base sm:text-lg
-                         hover:bg-white hover:text-red-600
-                         focus:bg-red-500 focus:ring-2 focus:ring-red-400
-                         active:bg-red-700 transition-colors shadow-sm"
-              style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
-            >
-              Sign Up
-            </button>
-          </Link>
           <Link href="/login" className="w-full">
             <button
               className="w-full px-5 py-2 sm:py-3 rounded-lg bg-red-600 text-white font-semibold text-base sm:text-lg
@@ -34,7 +23,7 @@ export default function MembershipPage() {
                          active:bg-red-700 transition-colors shadow-sm"
               style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
             >
-              Login
+              Klaim QR Code
             </button>
           </Link>
         </div>
@@ -45,11 +34,11 @@ export default function MembershipPage() {
             className="text-red-600 italic font-semibold"
             style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}
           >
-           Halaman M.GYM Membership 
+           klaim Code QR Membership | Cek Status Membership | Request Trainer | Testimoni | Semua fitur hanya dengan satu e-mail yang terdaftar. 
           </span>{' '}
-          adalah halaman eksklusif untuk para member M.GYM.
+          
           <br />
-          Di halaman ini member bisa cek status membership, request trainer dan memberikan testimoni kamu.
+          Berbagai fitur hanya dengan satu e-mail terdaftar. 
         </p>
       </div>
     </main>
