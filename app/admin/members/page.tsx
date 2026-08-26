@@ -7,6 +7,7 @@ import '../../globals.css';
 interface Member {
   id: string;
   nama: string;
+  email: string;
   tgl_daftar: string;
   tgl_berakhir: string;
 }
@@ -20,9 +21,11 @@ export default function MembersList() {
   const [editMember, setEditMember] = useState<Member | null>(null);
   const [editForm, setEditForm] = useState({
     nama: '',
+    email: '',
     tgl_daftar: '',
     tgl_berakhir: '',
   });
+
   const [editError, setEditError] = useState('');
 
   useEffect(() => {
@@ -31,9 +34,10 @@ export default function MembersList() {
 
   const fetchMembers = async () => {
     setLoading(true);
+
     const { data, error } = await supabase
       .from('members')
-      .select('id, nama, tgl_daftar, tgl_berakhir')
+      .select('id, nama, email, tgl_daftar, tgl_berakhir')
       .order('tgl_daftar', { ascending: false });
 
     if (!error && data) setMembers(data);
@@ -42,6 +46,7 @@ export default function MembersList() {
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from('members').delete().eq('id', id);
+
     if (!error) {
       setMembers(members.filter((m) => m.id !== id));
       setConfirmDeleteId(null);
@@ -52,15 +57,21 @@ export default function MembersList() {
 
   const openEdit = (member: Member) => {
     setEditMember(member);
+
     setEditForm({
       nama: member.nama,
+      email: member.email,
       tgl_daftar: member.tgl_daftar,
       tgl_berakhir: member.tgl_berakhir,
     });
+
     setEditError('');
   };
 
-  const handleEditChange = (field: keyof typeof editForm, value: string) => {
+  const handleEditChange = (
+    field: keyof typeof editForm,
+    value: string
+  ) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -68,7 +79,12 @@ export default function MembersList() {
     e.preventDefault();
     setEditError('');
 
-    if (!editForm.nama.trim() || !editForm.tgl_daftar.trim() || !editForm.tgl_berakhir.trim()) {
+    if (
+      !editForm.nama.trim() ||
+      !editForm.email.trim() ||
+      !editForm.tgl_daftar.trim() ||
+      !editForm.tgl_berakhir.trim()
+    ) {
       setEditError('Semua field wajib diisi ya!');
       return;
     }
@@ -77,6 +93,7 @@ export default function MembersList() {
       .from('members')
       .update({
         nama: editForm.nama,
+        email: editForm.email,
         tgl_daftar: editForm.tgl_daftar,
         tgl_berakhir: editForm.tgl_berakhir,
       })
@@ -91,12 +108,14 @@ export default function MembersList() {
             ? {
                 ...m,
                 nama: editForm.nama,
+                email: editForm.email,
                 tgl_daftar: editForm.tgl_daftar,
                 tgl_berakhir: editForm.tgl_berakhir,
               }
             : m
         )
       );
+
       setEditMember(null);
     }
   };
@@ -105,16 +124,17 @@ export default function MembersList() {
     m.nama.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
-  
   const getStatusColor = (tgl_berakhir: string) => {
     const now = new Date();
     const end = new Date(tgl_berakhir);
 
-    const diff = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    const diff = Math.ceil(
+      (end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
 
-    if (diff < 0) return 'bg-red-600';           // expired
-    if (diff <= 7) return 'bg-yellow-500';       // hampir expired
-    return 'bg-green-600';                       // aktif
+    if (diff < 0) return 'bg-red-600';
+    if (diff <= 7) return 'bg-yellow-500';
+    return 'bg-green-600';
   };
 
   return (
@@ -143,13 +163,22 @@ export default function MembersList() {
           </div>
         </div>
       ) : filteredMembers.length === 0 ? (
-        <p className="text-gray-400 font-[Plus Jakarta Sans]">Member tidak ditemukan.</p>
+        <p className="text-gray-400 font-[Plus Jakarta Sans]">
+          Member tidak ditemukan.
+        </p>
       ) : (
         <div className="overflow-x-auto rounded-md border border-white/10">
           <table className="w-full text-left font-[Plus Jakarta Sans]">
             <thead className="bg-white/10">
               <tr>
-                {['Nama', 'Tanggal Daftar', 'Tanggal Berakhir', 'Status', 'Aksi'].map((header) => (
+                {[
+                  'Nama',
+                  'Email',
+                  'Tanggal Daftar',
+                  'Tanggal Berakhir',
+                  'Status',
+                  'Aksi',
+                ].map((header) => (
                   <th
                     key={header}
                     className="px-4 py-3 uppercase tracking-wider text-white font-semibold border-b border-white/10 text-xs"
@@ -159,16 +188,36 @@ export default function MembersList() {
                 ))}
               </tr>
             </thead>
+
             <tbody className="divide-y divide-white/10 bg-black">
               {filteredMembers.map((m) => (
-                <tr key={m.id} className="hover:bg-white/10 transition-all duration-300 group">
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-300 font-medium text-sm">{m.nama}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">{m.tgl_daftar}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">{m.tgl_berakhir}</td>
+                <tr
+                  key={m.id}
+                  className="hover:bg-white/10 transition-all duration-300 group"
+                >
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-300 font-medium text-sm">
+                    {m.nama}
+                  </td>
+
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
+                    {m.email}
+                  </td>
+
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
+                    {m.tgl_daftar}
+                  </td>
+
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-400 text-sm">
+                    {m.tgl_berakhir}
+                  </td>
 
                   {/* STATUS COLOR */}
                   <td className="px-4 py-3 whitespace-nowrap">
-                    <div className={`w-4 h-4 rounded-full ${getStatusColor(m.tgl_berakhir)}`}></div>
+                    <div
+                      className={`w-4 h-4 rounded-full ${getStatusColor(
+                        m.tgl_berakhir
+                      )}`}
+                    ></div>
                   </td>
 
                   <td className="px-4 py-3 whitespace-nowrap space-x-2">
@@ -197,8 +246,13 @@ export default function MembersList() {
       {confirmDeleteId && (
         <div className="fixed inset-0 flex justify-center items-center z-50">
           <div className="bg-red-600 text-white rounded-lg shadow-lg w-60 text-center p-4 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards]">
-            <h3 className="text-lg font-semibold text-white mb-2">Hapus ?</h3>
-            <p className="text-gray-300 mb-2">Yakin menghapus member ini?</p>
+            <h3 className="text-lg font-semibold text-white mb-2">
+              Hapus ?
+            </h3>
+            <p className="text-gray-300 mb-2">
+              Yakin menghapus member ini?
+            </p>
+
             <div className="grid grid-cols-2 border-t rounded-2xl border-red-900/50">
               <button
                 onClick={() => setConfirmDeleteId(null)}
@@ -206,6 +260,7 @@ export default function MembersList() {
               >
                 Tidak
               </button>
+
               <button
                 onClick={() => handleDelete(confirmDeleteId)}
                 className="py-3 text-white font-medium hover:bg-red-950/50 transition-colors border-l border-red-900/50"
@@ -221,39 +276,70 @@ export default function MembersList() {
       {editMember && (
         <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/60 p-4">
           <div className="bg-black border border-white/10 rounded-lg shadow-lg w-full max-w-md p-6 scale-95 opacity-0 animate-[popIn_0.2s_ease-out_forwards] font-[Plus Jakarta Sans]">
-            <h3 className="text-xl font-semibold text-red-600 mb-4 text-center">Edit Member</h3>
-            <form onSubmit={handleEditSubmit} className="space-y-4 text-white text-sm">
+            <h3 className="text-xl font-semibold text-red-600 mb-4 text-center">
+              Edit Member
+            </h3>
+
+            <form
+              onSubmit={handleEditSubmit}
+              className="space-y-4 text-white text-sm"
+            >
               <div>
                 <label className="block mb-1">Nama:</label>
                 <input
                   type="text"
                   value={editForm.nama}
-                  onChange={(e) => handleEditChange('nama', e.target.value)}
+                  onChange={(e) =>
+                    handleEditChange('nama', e.target.value)
+                  }
                   className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
                   required
                 />
               </div>
+
+              <div>
+                <label className="block mb-1">Email:</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) =>
+                    handleEditChange('email', e.target.value)
+                  }
+                  className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
+                  required
+                />
+              </div>
+
               <div>
                 <label className="block mb-1">Tanggal Daftar:</label>
                 <input
                   type="date"
                   value={editForm.tgl_daftar}
-                  onChange={(e) => handleEditChange('tgl_daftar', e.target.value)}
+                  onChange={(e) =>
+                    handleEditChange('tgl_daftar', e.target.value)
+                  }
                   className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
                   required
                 />
               </div>
+
               <div>
                 <label className="block mb-1">Tanggal Berakhir:</label>
                 <input
                   type="date"
                   value={editForm.tgl_berakhir}
-                  onChange={(e) => handleEditChange('tgl_berakhir', e.target.value)}
+                  onChange={(e) =>
+                    handleEditChange('tgl_berakhir', e.target.value)
+                  }
                   className="w-full p-2 rounded-md bg-black border border-white/10 text-white focus:outline-none focus:ring focus:ring-red-600"
                   required
                 />
               </div>
-              {editError && <p className="text-red-500 text-center">{editError}</p>}
+
+              {editError && (
+                <p className="text-red-500 text-center">{editError}</p>
+              )}
+
               <div className="flex justify-between mt-6">
                 <button
                   type="button"
@@ -262,6 +348,7 @@ export default function MembersList() {
                 >
                   Batal
                 </button>
+
                 <button
                   type="submit"
                   className="px-4 py-2 bg-red-600 rounded-md hover:bg-red-700 transition-colors"
